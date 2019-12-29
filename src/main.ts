@@ -1,24 +1,43 @@
 import electron from 'electron';
 
-let win: electron.BrowserWindow | null;
+class ApplicationWindow {
 
-function createWindow() {
+	private static win: electron.BrowserWindow | null;
 
-	// Create the browser window.
-	const windowParameters = {
-		width: 800,
-		height: 600,
-		webPreferences: {
-			nodeIntegration: true
-		}
-	};
-	win = new electron.BrowserWindow(windowParameters);
-	// and load the index.html of the app.
-	win.loadFile('src/index.html');
-	win.webContents.openDevTools();
-	win.on('closed', () => {
-		win = null;
-	});
+	private constructor() {
+
+	}
+
+	public static createWindow(): electron.BrowserWindow | null {
+
+		if (ApplicationWindow.win)
+			return ApplicationWindow.win;
+
+		const parameters = {
+			width: 800,
+			height: 600,
+			webPreferences: {
+				nodeIntegration: true
+			}
+		};
+		ApplicationWindow.win = new electron.BrowserWindow(parameters);
+		// index.html を開きます。
+		ApplicationWindow.win.loadFile('src/index.html');
+		// Developer Tool を開きます。
+		if (false)
+			// @ts-ignore
+			win.webContents.openDevTools();
+		// 閉じられるときの処理です。
+		ApplicationWindow.win.on('closed', () => {
+			ApplicationWindow.close();
+		});
+		return ApplicationWindow.win;
+	}
+
+	private static close(): void {
+
+		ApplicationWindow.win = null;
+	}
 }
 
 function main() {
@@ -26,7 +45,7 @@ function main() {
 	const app = electron.app;
 
 	// アプリケーションが準備できた？
-	app.on('ready', createWindow);
+	app.on('ready', ApplicationWindow.createWindow);
 
 	// ウィンドウが閉じられた？
 	app.on('window-all-closed', () => {
@@ -37,9 +56,7 @@ function main() {
 
 	// ウィンドウがアクティブになった？
 	app.on('activate', () => {
-		if (win === null) {
-			createWindow()
-		}
+		ApplicationWindow.createWindow()
 	});
 }
 
