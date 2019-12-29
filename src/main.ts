@@ -1,5 +1,20 @@
-import electron from 'electron';
+import electron, { systemPreferences } from 'electron';
+import { writeFileSync } from 'fs';
 
+// ロギングクラス
+class Logger {
+
+	private constructor() {
+
+	}
+
+	public static writeLine(...params: object[]) {
+
+		// const file = new writeFileSync("electron-app-1.log", );
+	}
+}
+
+// ウィンドウクラス
 class ApplicationWindow {
 
 	private static win: electron.BrowserWindow | null;
@@ -8,7 +23,7 @@ class ApplicationWindow {
 
 	}
 
-	public static createWindow(): electron.BrowserWindow | null {
+	public static createWindow(): electron.BrowserWindow {
 
 		if (ApplicationWindow.win)
 			return ApplicationWindow.win;
@@ -40,24 +55,58 @@ class ApplicationWindow {
 	}
 }
 
+// アプリケーションクラス
+class Application {
+
+	private _app: electron.App | null = null;
+
+	private static _instance: Application | null = null;
+
+	private constructor() {
+
+	}
+
+	private getCoreApp(): electron.App {
+
+		if (!this._app)
+			this._app = electron.app;
+		return this._app;
+	}
+
+	public run(): void {
+
+		const app = this.getCoreApp();
+
+		// アプリケーションが準備できた？
+		app.on('ready', ApplicationWindow.createWindow);
+
+		// ウィンドウが閉じられた？
+		app.on('window-all-closed', () => {
+			if (process.platform !== 'darwin') {
+				app.quit()
+			}
+		})
+
+		// ウィンドウがアクティブになった？
+		app.on('activate', () => {
+			ApplicationWindow.createWindow()
+		});
+	}
+
+	public static getInstance(): Application {
+
+		if (!Application._instance) {
+			Application._instance = new Application();
+		}
+		return Application._instance;
+	}
+}
+
+// エントリーポイント
 function main() {
 
-	const app = electron.app;
-
-	// アプリケーションが準備できた？
-	app.on('ready', ApplicationWindow.createWindow);
-
-	// ウィンドウが閉じられた？
-	app.on('window-all-closed', () => {
-		if (process.platform !== 'darwin') {
-			app.quit()
-		}
-	})
-
-	// ウィンドウがアクティブになった？
-	app.on('activate', () => {
-		ApplicationWindow.createWindow()
-	});
+	const app = Application.getInstance();
+	app.run();
 }
 
 main();
