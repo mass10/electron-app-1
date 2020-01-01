@@ -65,7 +65,7 @@ export class CommandlineArguments {
 
 	public dump(): void {
 
-		Logger.trace("parameter dump(2)");
+		Logger.trace("parameter dump");
 		this._map.forEach((value: string, key: string) => {
 			Logger.trace("parameter [", key, "] >> [", value, "]");
 		});
