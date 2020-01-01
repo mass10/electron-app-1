@@ -30,7 +30,7 @@ export class ConfigurationSettings {
 	private _configure(path: string) {
 
 		try {
-			Logger.trace("begin configuration");
+			Logger.trace("$$$ begin configuration $$$");
 			const content = readFileSync(path, { encoding: "utf-8" });
 			const tree = jsyaml.safeLoad(content);
 			this.aaa = tree.aaa ?? "";
