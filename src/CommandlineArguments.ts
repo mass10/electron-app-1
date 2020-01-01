@@ -6,17 +6,20 @@ export class CommandlineArguments {
 
 	public constructor() {
 
-		this._analyze();
+		this._configure();
 	}
 
-	private _analyze(): void {
+	private _configure(): void {
 
+		// すべて消去
 		this._map.clear();
 
 		let option = "";
 		const options = {};
 		for (const e of process.argv) {
-			if (e.startsWith("--")) {
+			if (e === "--") {
+			}
+			else if (e.startsWith("--")) {
 				if (option) {
 					// 保留しているオプションを確定(boolean として格納)
 					this._map.set(option, true);
@@ -60,7 +63,7 @@ export class CommandlineArguments {
 		return this._map.get(key) ?? "";
 	}
 
-	public dump() {
+	public dump(): void {
 
 		Logger.trace("parameter dump(2)");
 		this._map.forEach((value: string, key: string) => {
