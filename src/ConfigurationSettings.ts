@@ -1,44 +1,51 @@
 import { readFileSync } from "fs";
 import jsyaml from "js-yaml";
+import { app } from "electron";
+import { Logger } from "./Logger";
+import { CommandlineArguments } from "./CommandlineArguments";
 
 // コンフィギュレーション
 export class ConfigurationSettings {
 
-	private _yaml = {};
+	private static _instance: ConfigurationSettings | null = null;
+
+	public aaa: string = "";
 
 	private construct() {
 
 	}
+	
+	public static getInstance(): ConfigurationSettings {
 
-	public static configure(): ConfigurationSettings {
+		if (ConfigurationSettings._instance)
+			return ConfigurationSettings._instance;
 
+		// コンフィギュレーション
 		const conf = new ConfigurationSettings();
-		conf.configure("conf/settings.yml");
+		conf._configure("conf/settings.yml");
+		ConfigurationSettings._instance = conf;
 		return conf;
 	}
 
-	public configure(path: string) {
+	private _configure(path: string) {
 
 		try {
-			const content = readFileSync(path, {encoding: "utf-8"});
+			Logger.trace("begin configuration");
+			const content = readFileSync(path, { encoding: "utf-8" });
 			const tree = jsyaml.safeLoad(content);
-			this._yaml = tree["settings"];
+			this.aaa = tree.aaa ?? "";
+			const args = new CommandlineArguments();
+			if (args.get("--aaa")) {
+				this.aaa = args.get("--aaa");
+			}
 		}
 		catch (e) {
 			if (e instanceof Error) {
-				console.log("[ERROR] コンフィギュレーションのエラーです。理由: ", e.message, ", name: ", e.name, ", stack: ", e.stack);
+				console.log("[ERROR] configuration error. reason: ", e.message, ", name: ", e.name, ", stack: ", e.stack);
 			}
 			else {
-				console.log("[ERROR] コンフィギュレーションのエラーです。理由: ", e);
+				console.log("[ERROR] configuration error. reason: ", e);
 			}
 		}
-	}
-
-	public get(key: string): any {
-
-		if (!this._yaml)
-			return "";
-		// @ts-ignore
-		return this._yaml[key];
 	}
 }

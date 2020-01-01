@@ -1,15 +1,9 @@
-import electron, { systemPreferences } from 'electron';
+import electron from 'electron';
 import { ConfigurationSettings } from './ConfigurationSettings'
 import { readFileSync, writeFileSync } from 'fs';
 import { Logger } from './Logger';
 import jsyaml from 'js-yaml';
-
-// type WindowSnapshotKey = {
-// 	width: number,
-// 	height: number,
-// 	left: number,
-// 	top: number
-// }
+import path from 'path';
 
 enum WindowSnapshotKeys {
 	width = "width",
@@ -72,12 +66,13 @@ type WindowParameter = {
 	height: string;
 	left: string;
 	top: string;
+	fullscreen: string;
 }
 
 // ウィンドウクラス
-export class ApplicationWindow {
+class ApplicationWindow {
 
-	private static _window: electron.BrowserWindow | null;
+	private _window: electron.BrowserWindow | null = null;
 
 	private static readonly _instance = new ApplicationWindow();
 
@@ -90,72 +85,80 @@ export class ApplicationWindow {
 		return ApplicationWindow._instance;
 	}
 
-	public getWindowParameter(): WindowParameter {
+	public getCurrentWindowState(): WindowParameter {
 
 		// ウィンドウオブジェクト
-		const window = ApplicationWindow._window;
-		if (!window) {
-			return {
-				width: "800",
-				height: "600",
-				left: "",
-				top: ""
-			};
-		}
+		const window = this._window;
+		if (!window)
+			return { width: "", height: "", left: "", top: "", fullscreen: "" };
+
 		// ウィンドウの大きさ
 		const size = window.getContentSize();
+		Logger.trace("ウィンドウの大きさ: ", size);
+
 		// ウィンドウの位置
 		const position = window.getPosition();
+		Logger.trace("ウィンドウの位置: ", position);
 
-		return {
-			width: `${size[0]}`,
-			height: `${size[1]}`,
-			left: `${position[0]}`,
-			top: `${position[1]}`
-		};
+		// フルスクリーン
+		const fullscreen = window.isFullScreen();
+		Logger.trace("フルスクリーン: ", fullscreen);
+
+		return { width: `${size[0]}`, height: `${size[1]}`,
+			left: `${position[0]}`, top: `${position[1]}`,
+			fullscreen: `${fullscreen}` };
 	}
 
-	public static createWindow(): electron.BrowserWindow {
+	private static onClosed(): void {
 
-		if (ApplicationWindow._window)
-			return ApplicationWindow._window;
+		Logger.trace("EVENT: [closed]");
+		ApplicationWindow.getInstance().close();
+	}
 
+	private static onReadyToShow(): void {
+
+		Logger.trace("EVENT: [ready-to-show]");
+	}
+
+	public createWindow(): electron.BrowserWindow {
+
+		if (this._window)
+			return this._window;
 		// コンフィギュレーション
-		const conf = ConfigurationSettings.configure();
-
+		const conf = ConfigurationSettings.getInstance();
 		// ウィンドウの状態を復元します。
 		const windowState = new WindowSnapshot();
 		windowState.get(WindowSnapshotKeys.left);
 		windowState.get(WindowSnapshotKeys.top);
 		windowState.get(WindowSnapshotKeys.width);
 		windowState.get(WindowSnapshotKeys.height);
-
 		const parameters = {
 			width: windowState.get(WindowSnapshotKeys.width) || 800,
 			height: windowState.get(WindowSnapshotKeys.height) || 600,
 			left: 10,
 			top: 10,
 			webPreferences: {
-				nodeIntegration: true
+				nodeIntegration: true,
+				preload: 'dist/preload.js'
 			}
 		};
-		ApplicationWindow._window = new electron.BrowserWindow(parameters);
+		const win = new electron.BrowserWindow(parameters);
 		// index.html を開きます。
-		ApplicationWindow._window.loadFile('src/index.html');
+		win.loadFile('./index.html');
 		// Developer Tool を開きます。
 		if (false)
-			// @ts-ignore
 			win.webContents.openDevTools();
 		// 閉じられるときの処理です。
-		ApplicationWindow._window.on('closed', () => {
-			ApplicationWindow.close();
-		});
-		return ApplicationWindow._window;
+		win.on('closed', ApplicationWindow.onClosed);
+		// 可視化されるときの処理(？)
+		win.once('ready-to-show', ApplicationWindow.onReadyToShow);
+		this._window = win;
+		return win;
 	}
 
-	private static close(): void {
+	private close(): void {
 
-		ApplicationWindow._window = null;
+		this._window = null;
 	}
 }
 
@@ -190,13 +193,13 @@ export class Application {
 	public static onApplicationReady(): void {
 
 		Logger.trace(["<Application.onApplicationReady()>"]);
-		ApplicationWindow.createWindow();
+		ApplicationWindow.getInstance().createWindow();
 	}
 
 	public static onApplicationActivate(): void {
 
 		Logger.trace(["<Application.onApplicationActivate()>"]);
-		ApplicationWindow.createWindow();
+		ApplicationWindow.getInstance().createWindow();
 	}
 
 	private save(): void {
@@ -205,7 +208,7 @@ export class Application {
 
 		// ウィンドウの状態を取得します。
 		const window = ApplicationWindow.getInstance();
-		const param = window.getWindowParameter();
+		const param = window.getCurrentWindowState();
 
 		// 一時ファイルに記録します。
 		const temp = new WindowSnapshot();
@@ -227,7 +230,7 @@ export class Application {
 
 		Logger.trace(["<Application.run()> ### START ###"]);
 
-		const conf = ConfigurationSettings.configure();
+		const conf = ConfigurationSettings.getInstance();
 
 		const app = this.getCoreApp();
 		// アプリケーションが準備できた？

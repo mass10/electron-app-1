@@ -12,7 +12,7 @@ export class Logger {
 
 	}
 
-	public static trace(...params: object[]): void {
+	public static trace(...params: any[]): void {
 
 		// ログファイルをローテーション
 		Logger.roateLogs();
