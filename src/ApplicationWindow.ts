@@ -88,7 +88,7 @@ export class ApplicationWindow {
 	public getCurrentWindowState(): WindowParameter {
 
 		// ウィンドウオブジェクト
-		const window = this._window;
+		const window = this.getWindow();
 
 		if (!window)
 			return { width: "", height: "", left: "", top: "", fullscreen: "" };
@@ -122,6 +122,7 @@ export class ApplicationWindow {
 	}
 
 	private getWindow(): electron.BrowserWindow | null {
+
 		return this._window;
 	}
 
