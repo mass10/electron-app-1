@@ -1,7 +1,14 @@
-# electron-app-1
+# プロジェクトの作り方
 
-* npm i -D electron@latest
+```
+* yarn init
+* yarn add electron
 * yarn add typescript
 * yarn tsc --init
-* yarn start
- 
+```
+
+# アプリケーションの実行(開発時)
+
+```
+* yarn electron .
+```
