@@ -51,9 +51,9 @@ export class Application {
 		ApplicationWindow.getInstance().createWindow();
 	}
 
-	public save(): void {
+	public saveAppStatus(): void {
 
-		Logger.trace(["<Application.save()> アプリケーションの状態を保存しています..."]);
+		Logger.trace(["<Application.saveAppStatus()> アプリケーションの状態を保存しています..."]);
 
 		// ウィンドウの状態を取得します。
 		const window = ApplicationWindow.getInstance();
@@ -71,7 +71,7 @@ export class Application {
 	public quit(): void {
 
 		Logger.trace(["<Application.quit()>"]);
-		this.save();
+		this.saveAppStatus();
 		this.getCoreApp().quit();
 	}
 
