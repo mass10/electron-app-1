@@ -1,14 +1,20 @@
-# プロジェクトの作り方
+# プロジェクトを作る。
 
 ```
-* yarn init
-* yarn add electron
-* yarn add typescript
-* yarn tsc --init
+yarn init
+yarn add electron
+yarn add typescript
+yarn tsc --init
 ```
 
-# アプリケーションの実行(開発時)
+# アプリケーションをビルドする。
 
 ```
-* yarn electron .
+yarn tsc
+```
+
+# アプリケーションを実行する。(開発時)
+
+```
+yarn electron .
 ```
