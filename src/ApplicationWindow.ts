@@ -10,25 +10,21 @@ export enum WindowSnapshotKeys {
 	height = "height",
 	left = "left",
 	top = "top",
+	fullscreen = "fullscreen"
 }
 
 // ウィンドウの状態を格納するクラスです。前回終了時の状態を復元するために利用されます。
 export class WindowSnapshot {
 
 	private _settings = {
-		"width": "",
-		"height": "",
-		"left": "",
-		"top": ""
+		width: "",
+		height: "",
+		left: "",
+		top: "",
+		fullscreen: ""
 	};
 
-	public width: string = "";
-
-	public height: string = "";
-
-	public left: string = "";
-
-	public top: string = "";
+	// private readonly _settings_bak = new Map<WindowSnapshotKeys, any>();
 
 	public constructor() {
 
