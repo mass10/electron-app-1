@@ -2,14 +2,15 @@ import electron from 'electron';
 import { ConfigurationSettings } from './ConfigurationSettings'
 import { readFileSync, writeFileSync } from 'fs';
 import { Logger } from './Logger';
-import { ApplicationWindow, WindowSnapshot } from './ApplicationWindow';
+import { ApplicationWindow, WindowSnapshot, WindowSnapshotKeys } from './ApplicationWindow';
 
-enum WindowSnapshotKeys {
-	width = "width",
-	height = "height",
-	left = "left",
-	top = "top",
-}
+// enum WindowSnapshotKeys {
+// 	width = "width",
+// 	height = "height",
+// 	left = "left",
+// 	top = "top",
+// 	fullscreen = "fullscreen"
+// }
 
 export class Application {
 
@@ -57,14 +58,20 @@ export class Application {
 
 		// ウィンドウの状態を取得します。
 		const window = ApplicationWindow.getInstance();
+		if (!window)
+			// アプリケーションのウィンドウはありません。
+			return;
 		const param = window.getCurrentWindowState();
-
+		if (!param)
+			// アプリケーションのウィンドウはありません。
+			return;
 		// 一時ファイルに記録します。
 		const temp = new WindowSnapshot();
 		temp.set(WindowSnapshotKeys.left, param.left);
 		temp.set(WindowSnapshotKeys.top, param.top);
 		temp.set(WindowSnapshotKeys.width, param.width);
 		temp.set(WindowSnapshotKeys.height, param.height);
+		temp.set(WindowSnapshotKeys.fullscreen, param.height);
 		temp.save();
 	}
 
