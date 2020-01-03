@@ -18,10 +18,16 @@ export class Application {
 
 	private static readonly _instance: Application = new Application();
 
+	/**
+	 * コンストラクター
+	 */
 	private constructor() {
 
 	}
 
+	/**
+	 * electron.App オブジェクトを返します。
+	 */
 	private getCoreApp(): electron.App {
 
 		if (!this._application)
@@ -29,14 +35,19 @@ export class Application {
 		return this._application;
 	}
 
+	/**
+	 * すべてのウィンドウが閉じられたときのイベントハンドラーです。
+	 */
 	public static onApplicationClose(): void {
 
 		Logger.trace(["<Application.onApplicationClose()>"]);
+
 		switch (process.platform) {
 			case 'darwin':
 				break;
 			default:
 				Application.getInstance().quit();
+				break;
 		}
 	}
 
@@ -52,7 +63,9 @@ export class Application {
 		ApplicationWindow.getInstance().createWindow();
 	}
 
-	public saveAppStatus(): void {
+	private readonly temp = new WindowSnapshot();
+
+	public saveAppStatus(flush: boolean = false): void {
 
 		Logger.trace(["<Application.saveAppStatus()> アプリケーションの状態を保存しています..."]);
 
@@ -61,24 +74,33 @@ export class Application {
 		if (!window)
 			// アプリケーションのウィンドウはありません。
 			return;
+
 		const param = window.getCurrentWindowState();
 		if (!param)
 			// アプリケーションのウィンドウはありません。
 			return;
-		// 一時ファイルに記録します。
-		const temp = new WindowSnapshot();
-		temp.set(WindowSnapshotKeys.left, param.left);
-		temp.set(WindowSnapshotKeys.top, param.top);
-		temp.set(WindowSnapshotKeys.width, param.width);
-		temp.set(WindowSnapshotKeys.height, param.height);
-		temp.set(WindowSnapshotKeys.fullscreen, param.height);
-		temp.save();
+
+		// ウィンドウの状態を記録します。
+		this.temp.set(WindowSnapshotKeys.left, param.left);
+		this.temp.set(WindowSnapshotKeys.top, param.top);
+		this.temp.set(WindowSnapshotKeys.width, param.width);
+		this.temp.set(WindowSnapshotKeys.height, param.height);
+		this.temp.set(WindowSnapshotKeys.fullscreen, param.height);
+
+		if (!flush)
+			// ファイルに出力せずに終了します。
+			return;
+
+		// ファイルに記録します。
+		this.temp.save();
 	}
 
 	public quit(): void {
 
 		Logger.trace(["<Application.quit()>"]);
-		this.saveAppStatus();
+		// アプリケーションの終了状態を保存します。
+		this.saveAppStatus(true);
+		// electron アプリケーションを終了します。
 		this.getCoreApp().quit();
 	}
 
