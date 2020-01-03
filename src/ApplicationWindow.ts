@@ -128,7 +128,7 @@ export class ApplicationWindow {
 		Logger.trace("EVENT: [will-resize]");
 
 		// アプリケーションの状態を保存します。
-		Application.getInstance().saveAppStatus(false);
+		Application.getInstance().saveAppStatus();
 	}
 
 	public createWindow(): electron.BrowserWindow {
