@@ -16,15 +16,7 @@ export enum WindowSnapshotKeys {
 // ウィンドウの状態を格納するクラスです。前回終了時の状態を復元するために利用されます。
 export class WindowSnapshot {
 
-	private _settings = {
-		width: "",
-		height: "",
-		left: "",
-		top: "",
-		fullscreen: ""
-	};
-
-	// private readonly _settings_bak = new Map<WindowSnapshotKeys, any>();
+	private _settings: any = {};
 
 	public constructor() {
 
@@ -34,7 +26,7 @@ export class WindowSnapshot {
 			this._settings = yaml;
 		}
 		catch (e) {
-			Logger.trace(["スナップショットファイルをオープンできませんでした。理由: ", e]);
+			Logger.trace("スナップショットファイルをオープンできませんでした。理由: ", e);
 		}
 	}
 
@@ -81,6 +73,8 @@ export class ApplicationWindow {
 		return ApplicationWindow._instance;
 	}
 
+	private readonly _position = [0, 0];
+
 	public getCurrentWindowState(): WindowParameter {
 
 		// ウィンドウオブジェクト
@@ -96,13 +90,20 @@ export class ApplicationWindow {
 		// ウィンドウの位置
 		const position = window.getPosition();
 		Logger.trace("ウィンドウの位置: ", position);
+		if (position[0] == 0 && position[1] == 0) {
+			// ウィンドウは存在しない
+		}
+		else {
+			this._position[0] = position[0];
+			this._position[1] = position[1];
+		}
 
 		// フルスクリーン
 		const fullscreen = window.isFullScreen();
 		Logger.trace("フルスクリーン: ", fullscreen);
 
 		return { width: `${size[0]}`, height: `${size[1]}`,
-			left: `${position[0]}`, top: `${position[1]}`,
+			left: `${this._position[0]}`, top: `${this._position[1]}`,
 			fullscreen: `${fullscreen}` };
 	}
 
@@ -127,7 +128,7 @@ export class ApplicationWindow {
 		Logger.trace("EVENT: [will-resize]");
 
 		// アプリケーションの状態を保存します。
-		Application.getInstance().saveAppStatus();
+		Application.getInstance().saveAppStatus(false);
 	}
 
 	public createWindow(): electron.BrowserWindow {
