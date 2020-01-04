@@ -70,6 +70,12 @@ export class Application {
 
 	private readonly temp = new WindowSnapshot();
 
+	/**
+	 * アプリケーションの状態を保存します。
+	 * @param flush true が要求された場合はファイルに書き込みを行います。
+	 * false のときはメモリを更新するだけです。
+	 * 引数が指定されなかっったときは false が指定されたものとします。
+	 */
 	public saveAppStatus(flush: boolean = false): void {
 
 		Logger.trace(["<Application.saveAppStatus()> アプリケーションの状態を保存しています..."]);
@@ -100,6 +106,9 @@ export class Application {
 		this.temp.save();
 	}
 
+	/**
+	 * アプリケーションを終了します。
+	 */
 	public quit(): void {
 
 		Logger.trace(["<Application.quit()>"]);
@@ -109,6 +118,9 @@ export class Application {
 		this.getCoreApp().quit();
 	}
 
+	/**
+	 * アプリケーションを実行します。
+	 */
 	public run(): void {
 
 		Logger.trace(["<Application.run()> ### START ###"]);
@@ -128,6 +140,10 @@ export class Application {
 		Logger.trace(["<Application.run()> --- END ---"]);
 	}
 
+	/**
+	 * アプリケーション唯一のインスタンスを返します。
+	 * どこから呼び出されても同一のインスタンスを返します。
+	 */
 	public static getInstance(): Application {
 
 		return Application._instance;
