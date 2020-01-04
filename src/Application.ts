@@ -63,6 +63,11 @@ export class Application {
 		ApplicationWindow.getInstance().createWindow();
 	}
 
+	public static onApplicationWillQuit(): void {
+
+		Logger.trace(["<Application.onApplicationWillQuit()>"]);
+	}
+
 	private readonly temp = new WindowSnapshot();
 
 	public saveAppStatus(flush: boolean = false): void {
@@ -117,6 +122,8 @@ export class Application {
 		app.on('window-all-closed', Application.onApplicationClose);
 		// ウィンドウがアクティブになった？
 		app.on('activate', Application.onApplicationActivate);
+		// ？？
+		app.on('will-quit', Application.onApplicationWillQuit);
 
 		Logger.trace(["<Application.run()> --- END ---"]);
 	}
