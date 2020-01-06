@@ -64,6 +64,8 @@ export class ApplicationWindow {
 
 	private static readonly _instance = new ApplicationWindow();
 
+	private readonly _position = { left: 0, top: 0 };
+
 	private constructor() {
 
 	}
@@ -73,7 +75,10 @@ export class ApplicationWindow {
 		return ApplicationWindow._instance;
 	}
 
-	private readonly _position = [0, 0];
+	public isVisible(): boolean {
+
+		return this.getWindow()?.isVisible() ?? false;
+	}
 
 	public getCurrentWindowState(): WindowParameter {
 
@@ -88,28 +93,35 @@ export class ApplicationWindow {
 		Logger.trace("ウィンドウの大きさ: ", size);
 
 		// ウィンドウの位置
-		const position = window.getPosition();
-		Logger.trace("ウィンドウの位置: ", position);
-		if (position[0] == 0 && position[1] == 0) {
-			// ウィンドウは存在しない
+		if (window.isVisible()) {
+			const position = window.getPosition();
+			Logger.trace("ウィンドウの位置: left: ", position[0], ", top: ", position[1]);
+			this._position.left = position[0];
+			this._position.top = position[1];
 		}
 		else {
-			this._position[0] = position[0];
-			this._position[1] = position[1];
+			Logger.trace("ウィンドウの位置: invisible");
 		}
 
 		// フルスクリーン
 		const fullscreen = window.isFullScreen();
 		Logger.trace("フルスクリーン: ", fullscreen);
 
-		return { width: `${size[0]}`, height: `${size[1]}`,
-			left: `${this._position[0]}`, top: `${this._position[1]}`,
-			fullscreen: `${fullscreen}` };
+		const windowState = {
+			width: `${size[0]}`,
+			height: `${size[1]}`,
+			left: `${this._position.left}`,
+			top: `${this._position.top}`,
+			fullscreen: `${fullscreen}`
+		};
+		return windowState;
 	}
 
 	private static onClosed(): void {
 
 		Logger.trace("EVENT: [closed]");
+
+		// ウィンドウを閉じます。
 		ApplicationWindow.getInstance().close();
 	}
 
@@ -131,6 +143,10 @@ export class ApplicationWindow {
 		Application.getInstance().saveAppStatus();
 	}
 
+	/**
+	 * ウィンドウを作成します。
+	 * @returns electron.BrowserWindow
+	 */
 	public createWindow(): electron.BrowserWindow {
 
 		if (this._window)
@@ -139,15 +155,12 @@ export class ApplicationWindow {
 		const conf = ConfigurationSettings.getInstance();
 		// ウィンドウの状態を復元します。
 		const windowState = new WindowSnapshot();
-		windowState.get(WindowSnapshotKeys.left);
-		windowState.get(WindowSnapshotKeys.top);
-		windowState.get(WindowSnapshotKeys.width);
-		windowState.get(WindowSnapshotKeys.height);
 		const parameters = {
 			width: windowState.get(WindowSnapshotKeys.width) || 800,
 			height: windowState.get(WindowSnapshotKeys.height) || 600,
-			left: 10,
-			top: 10,
+			left: windowState.get(WindowSnapshotKeys.left) ?? 0,
+			top: windowState.get(WindowSnapshotKeys.top) ?? 0,
+			fullscreen: windowState.get(WindowSnapshotKeys.fullscreen) ?? false,
 			webPreferences: {
 				nodeIntegration: true,
 				preload: 'dist/preload.js'
