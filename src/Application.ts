@@ -1,16 +1,7 @@
 import electron from 'electron';
 import { ConfigurationSettings } from './ConfigurationSettings'
-import { readFileSync, writeFileSync } from 'fs';
 import { Logger } from './Logger';
 import { ApplicationWindow, WindowSnapshot, WindowSnapshotKeys } from './ApplicationWindow';
-
-// enum WindowSnapshotKeys {
-// 	width = "width",
-// 	height = "height",
-// 	left = "left",
-// 	top = "top",
-// 	fullscreen = "fullscreen"
-// }
 
 export class Application {
 
@@ -68,7 +59,7 @@ export class Application {
 		Logger.trace(["<Application.onApplicationWillQuit()>"]);
 	}
 
-	private readonly temp = new WindowSnapshot();
+	private readonly _temp = new WindowSnapshot();
 
 	/**
 	 * アプリケーションの状態を保存します。
@@ -77,8 +68,6 @@ export class Application {
 	 * 引数が指定されなかっったときは false が指定されたものとします。
 	 */
 	public saveAppStatus(flush: boolean = false): void {
-
-		Logger.trace(["<Application.saveAppStatus()> アプリケーションの状態を保存しています..."]);
 
 		// ウィンドウの状態を取得します。
 		const window = ApplicationWindow.getInstance();
@@ -92,18 +81,21 @@ export class Application {
 			return;
 
 		// ウィンドウの状態を記録します。
-		this.temp.set(WindowSnapshotKeys.left, param.left);
-		this.temp.set(WindowSnapshotKeys.top, param.top);
-		this.temp.set(WindowSnapshotKeys.width, param.width);
-		this.temp.set(WindowSnapshotKeys.height, param.height);
-		this.temp.set(WindowSnapshotKeys.fullscreen, param.height);
+		if (window.isVisible()) {
+			this._temp.set(WindowSnapshotKeys.left, param.left);
+			this._temp.set(WindowSnapshotKeys.top, param.top);
+			this._temp.set(WindowSnapshotKeys.width, param.width);
+			this._temp.set(WindowSnapshotKeys.height, param.height);
+			this._temp.set(WindowSnapshotKeys.fullscreen, param.fullscreen);
+		}
 
-		if (!flush)
+		if (!flush) {
 			// ファイルに出力せずに終了します。
 			return;
+		}
 
 		// ファイルに記録します。
-		this.temp.save();
+		this._temp.save();
 	}
 
 	/**
