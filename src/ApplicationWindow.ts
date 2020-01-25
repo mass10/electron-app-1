@@ -155,6 +155,8 @@ export class ApplicationWindow {
 		const conf = ConfigurationSettings.getInstance();
 		// ウィンドウの状態を復元します。
 		const windowState = new WindowSnapshot();
+		Logger.trace("ウィンドウ初期状態: ");
+		console.log(windowState);
 		const parameters = {
 			width: windowState.get(WindowSnapshotKeys.width) || 800,
 			height: windowState.get(WindowSnapshotKeys.height) || 600,
@@ -166,20 +168,21 @@ export class ApplicationWindow {
 				preload: 'dist/preload.js'
 			}
 		};
-		const win = new electron.BrowserWindow(parameters);
-		// index.html を開きます。
-		win.loadFile('./index.html');
+		// アプリケーションのメインウィンドウです。
+		const window = new electron.BrowserWindow(parameters);
+		// メインウィンドウで index.html を開きます。
+		window.loadFile('./index.html');
 		// Developer Tool を開きます。
 		if (false)
-			win.webContents.openDevTools();
+			window.webContents.openDevTools();
 		// 閉じられるときの処理です。
-		win.on('closed', ApplicationWindow.onClosed);
+		window.on('closed', ApplicationWindow.onClosed);
 		// ウィンドウのリサイズ
-		win.on("will-resize", ApplicationWindow.onWindowResize);
+		window.on("will-resize", ApplicationWindow.onWindowResize);
 		// 可視化されるときの処理(？)
-		win.once('ready-to-show', ApplicationWindow.onReadyToShow);
-		this._window = win;
-		return win;
+		window.once('ready-to-show', ApplicationWindow.onReadyToShow);
+		this._window = window;
+		return window;
 	}
 
 	private close(): void {
