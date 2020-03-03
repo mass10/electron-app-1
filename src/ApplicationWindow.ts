@@ -5,6 +5,9 @@ import { Logger } from './Logger';
 import jsyaml from 'js-yaml';
 import { Application } from './Application';
 
+/**
+ * スナップショット属性のキー
+ */
 export enum WindowSnapshotKeys {
 	width = "width",
 	height = "height",
@@ -13,11 +16,16 @@ export enum WindowSnapshotKeys {
 	fullscreen = "fullscreen"
 }
 
-// ウィンドウの状態を格納するクラスです。前回終了時の状態を復元するために利用されます。
+/**
+ * ウィンドウの状態を格納するクラスです。前回終了時の状態を復元するために利用されます。
+ */
 export class WindowSnapshot {
 
 	private _settings: any = {};
 
+	/**
+	 * コンストラクター
+	 */
 	public constructor() {
 
 		try {
@@ -30,16 +38,28 @@ export class WindowSnapshot {
 		}
 	}
 
+	/**
+	 * スナップショットに値を保管します。
+	 * @param key 
+	 * @param value 
+	 */
 	public set(key: WindowSnapshotKeys, value: any): void {
 
 		this._settings[key] = value;
 	}
 
+	/**
+	 * スナップショットから値を取り出します。
+	 * @param key 
+	 */
 	public get(key: WindowSnapshotKeys): any {
 
 		return this._settings[key];
 	}
 
+	/**
+	 * スナップショットをファイルに書き込みます。
+	 */
 	public save(): void {
 
 		Logger.trace(["<WindowSnapshot.save()>"]);
@@ -48,7 +68,9 @@ export class WindowSnapshot {
 	}
 }
 
-// ウィンドウの状態を表現する項目名
+/**
+ * ウィンドウの状態を表現する項目名
+ */
 export type WindowParameter = {
 	width: string;
 	height: string;
@@ -57,7 +79,9 @@ export type WindowParameter = {
 	fullscreen: string;
 }
 
-// ウィンドウクラス
+/**
+ * ウィンドウクラス
+ */
 export class ApplicationWindow {
 
 	private _window: electron.BrowserWindow | null = null;
@@ -66,20 +90,32 @@ export class ApplicationWindow {
 
 	private readonly _position = { left: 0, top: 0 };
 
+	/**
+	 * コンストラクター
+	 */
 	private constructor() {
 
 	}
 
+	/**
+	 * グローバルなインスタンスを返します。
+	 */
 	public static getInstance(): ApplicationWindow {
 
 		return ApplicationWindow._instance;
 	}
 
+	/**
+	 * ウィンドウが可視状態にあるかどうかを調べます。
+	 */
 	public isVisible(): boolean {
 
 		return this.getWindow()?.isVisible() ?? false;
 	}
 
+	/**
+	 * ウィンドウの状態を調べます。
+	 */
 	public getCurrentWindowState(): WindowParameter {
 
 		// ウィンドウオブジェクト
@@ -100,7 +136,7 @@ export class ApplicationWindow {
 			this._position.top = position[1];
 		}
 		else {
-			Logger.trace("ウィンドウの位置: invisible");
+			Logger.trace("ウィンドウの位置: (invisible)");
 		}
 
 		// フルスクリーン
@@ -117,6 +153,9 @@ export class ApplicationWindow {
 		return windowState;
 	}
 
+	/**
+	 * ウィンドウが閉じられたとき
+	 */
 	private static onClosed(): void {
 
 		Logger.trace("EVENT: [closed]");
@@ -125,16 +164,25 @@ export class ApplicationWindow {
 		ApplicationWindow.getInstance().close();
 	}
 
+	/**
+	 * ウィンドウの準備ができたとき
+	 */
 	private static onReadyToShow(): void {
 
 		Logger.trace("EVENT: [ready-to-show]");
 	}
 
+	/**
+	 * ウィンドウを返します。
+	 */
 	private getWindow(): electron.BrowserWindow | null {
 
 		return this._window;
 	}
 
+	/**
+	 * ウィンドウのサイズが変更されたとき
+	 */
 	private static onWindowResize(): void {
 
 		Logger.trace("EVENT: [will-resize]");
@@ -176,15 +224,18 @@ export class ApplicationWindow {
 		if (false)
 			window.webContents.openDevTools();
 		// 閉じられるときの処理です。
-		window.on('closed', ApplicationWindow.onClosed);
+		window.on("closed", ApplicationWindow.onClosed);
 		// ウィンドウのリサイズ
 		window.on("will-resize", ApplicationWindow.onWindowResize);
 		// 可視化されるときの処理(？)
-		window.once('ready-to-show', ApplicationWindow.onReadyToShow);
+		window.once("ready-to-show", ApplicationWindow.onReadyToShow);
 		this._window = window;
 		return window;
 	}
 
+	/**
+	 * ウィンドウを閉じます。
+	 */
 	private close(): void {
 
 		this._window = null;

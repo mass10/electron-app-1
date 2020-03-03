@@ -3,10 +3,15 @@ import { ConfigurationSettings } from './ConfigurationSettings'
 import { Logger } from './Logger';
 import { ApplicationWindow, WindowSnapshot, WindowSnapshotKeys } from './ApplicationWindow';
 
+/**
+ * アプリケーション本体のクラス
+ */
 export class Application {
 
+	/** electron.App */
 	private _application: electron.App | null = null;
 
+	/** 唯一のインスタンス */
 	private static readonly _instance: Application = new Application();
 
 	/**
