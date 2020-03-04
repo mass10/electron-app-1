@@ -59,6 +59,9 @@ export class Application {
 		ApplicationWindow.getInstance().createWindow();
 	}
 
+	public static onApplicationFullScreen(): void {
+	}
+
 	public static onApplicationWillQuit(): void {
 
 		Logger.trace(["<Application.onApplicationWillQuit()>"]);
@@ -133,6 +136,7 @@ export class Application {
 		app.on('activate', Application.onApplicationActivate);
 		// ？？
 		app.on('will-quit', Application.onApplicationWillQuit);
+		// app.on("enter-full-screen", Application.onApplicationFullScreen);
 
 		Logger.trace(["<Application.run()> --- END ---"]);
 	}
