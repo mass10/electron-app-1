@@ -1,7 +1,7 @@
 import electron from 'electron';
 import { ConfigurationSettings } from './ConfigurationSettings'
 import { Logger } from './Logger';
-import { ApplicationWindow, WindowSnapshot, WindowSnapshotKeys } from './ApplicationWindow';
+import { ApplicationWindow, WindowSnapshot, WindowSnapshotKey } from './ApplicationWindow';
 
 /**
  * アプリケーション本体のクラス
@@ -90,11 +90,11 @@ export class Application {
 
 		// ウィンドウの状態を記録します。
 		if (window.isVisible()) {
-			this._temp.set(WindowSnapshotKeys.left, param.left);
-			this._temp.set(WindowSnapshotKeys.top, param.top);
-			this._temp.set(WindowSnapshotKeys.width, param.width);
-			this._temp.set(WindowSnapshotKeys.height, param.height);
-			this._temp.set(WindowSnapshotKeys.fullscreen, param.fullscreen);
+			this._temp.set("left", param.left);
+			this._temp.set("top", param.top);
+			this._temp.set("width", param.width);
+			this._temp.set("height", param.height);
+			this._temp.set("fullscreen", param.fullscreen);
 		}
 
 		if (!flush) {
