@@ -1,14 +1,23 @@
 import { Logger } from "./Logger";
 
+/**
+ * コマンドライン引数の解析器
+ */
 export class CommandlineArguments {
 
 	private readonly _map = new Map<string, any>();
 
+	/**
+	 * コンストラクター
+	 */
 	public constructor() {
 
 		this._configure();
 	}
 
+	/**
+	 * コンフィギュレーション
+	 */
 	private _configure(): void {
 
 		// すべて消去
@@ -58,11 +67,18 @@ export class CommandlineArguments {
 			this.dump();
 	}
 
+	/**
+	 * 取り出し
+	 * @param key 
+	 */
 	public get(key: string): string {
 
 		return this._map.get(key) ?? "";
 	}
 
+	/**
+	 * デバッグ用
+	 */
 	public dump(): void {
 
 		Logger.trace("parameter dump");
