@@ -69,6 +69,7 @@ export class CommandlineArguments {
 
 	/**
 	 * 取り出し
+	 * 
 	 * @param key 
 	 */
 	public get(key: string): string {
