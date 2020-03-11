@@ -84,18 +84,18 @@ export class Application {
 			// アプリケーションのウィンドウはありません。
 			return;
 
-		const param = window.getCurrentWindowState();
-		if (!param)
+		const state = window.getCurrentWindowState();
+		if (!state)
 			// アプリケーションのウィンドウはありません。
 			return;
 
 		// ウィンドウの状態を記録します。
 		if (window.isVisible()) {
-			this._temp.set("left", param.left);
-			this._temp.set("top", param.top);
-			this._temp.set("width", param.width);
-			this._temp.set("height", param.height);
-			this._temp.set("fullscreen", param.fullscreen);
+			this._temp.set("left", state.left);
+			this._temp.set("top", state.top);
+			this._temp.set("width", state.width);
+			this._temp.set("height", state.height);
+			this._temp.set("fullscreen", state.fullscreen);
 		}
 
 		if (!flush) {
