@@ -39,6 +39,7 @@ export class WindowSnapshot {
 
 	/**
 	 * スナップショットに値を保管します。
+	 * 
 	 * @param key 
 	 * @param value 
 	 */
@@ -49,6 +50,7 @@ export class WindowSnapshot {
 
 	/**
 	 * スナップショットから値を取り出します。
+	 * 
 	 * @param key 
 	 */
 	public get(key: WindowSnapshotKey): any {
@@ -208,6 +210,7 @@ export class ApplicationWindow {
 
 	/**
 	 * ウィンドウを作成します。
+	 * 
 	 * @returns electron.BrowserWindow
 	 */
 	public createWindow(): electron.BrowserWindow {
