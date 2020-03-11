@@ -24,7 +24,7 @@ export class Application {
 	/**
 	 * electron.App オブジェクトを返します。
 	 */
-	private getCoreApp(): electron.App {
+	private getElectronApp(): electron.App {
 
 		if (!this._application)
 			this._application = electron.app;
@@ -40,8 +40,10 @@ export class Application {
 
 		switch (process.platform) {
 			case 'darwin':
+				// なにもしない
 				break;
 			default:
+				// アプリケーションを終了します。
 				Application.getInstance().quit();
 				break;
 		}
@@ -50,12 +52,14 @@ export class Application {
 	public static onApplicationReady(): void {
 
 		Logger.trace(["<Application.onApplicationReady()>"]);
+
 		ApplicationWindow.getInstance().createWindow();
 	}
 
 	public static onApplicationActivate(): void {
 
 		Logger.trace(["<Application.onApplicationActivate()>"]);
+
 		ApplicationWindow.getInstance().createWindow();
 	}
 
@@ -113,10 +117,11 @@ export class Application {
 	public quit(): void {
 
 		Logger.trace(["<Application.quit()>"]);
+
 		// アプリケーションの終了状態を保存します。
 		this.saveAppStatus(true);
 		// electron アプリケーションを終了します。
-		this.getCoreApp().quit();
+		this.getElectronApp().quit();
 	}
 
 	/**
@@ -128,7 +133,7 @@ export class Application {
 
 		const conf = ConfigurationSettings.getInstance();
 
-		const app = this.getCoreApp();
+		const app = this.getElectronApp();
 		// アプリケーションが準備できた？
 		app.on('ready', Application.onApplicationReady);
 		// ウィンドウが閉じられた？
