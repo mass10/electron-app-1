@@ -1,3 +1,8 @@
+/**
+ * 右埋め
+ * @param s 
+ * @param len 
+ */
 function _rpad(s: any, len: number): string {
 
 	s = "" + s;
@@ -7,7 +12,9 @@ function _rpad(s: any, len: number): string {
 	return s;
 }
 
-// タイムスタンプに関するさまざまな操作を提供します。
+/**
+ * タイムスタンプに関するさまざまな操作を提供します。
+ */
 export class Timestamp {
 
 	private constructor() {
