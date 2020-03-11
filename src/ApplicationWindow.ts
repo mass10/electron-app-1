@@ -1,6 +1,6 @@
 import electron from 'electron';
 import { ConfigurationSettings } from './ConfigurationSettings'
-import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { Logger } from './Logger';
 import jsyaml from 'js-yaml';
 import { Application } from './Application';
@@ -64,7 +64,8 @@ export class WindowSnapshot {
 
 		Logger.trace(["<WindowSnapshot.save()>"]);
 		const content = jsyaml.safeDump(this._settings);
-		mkdirSync("conf");
+		if (!existsSync("conf"))
+			mkdirSync("conf");
 		writeFileSync("conf/.application-settings-snapshot.yml", content, { flag: "w" });
 	}
 }
@@ -85,10 +86,13 @@ export type WindowParameter = {
  */
 export class ApplicationWindow {
 
+	/** ウィンドウクラスのインスタンス */
 	private _window: electron.BrowserWindow | null = null;
 
+	/** 唯一のインスタンス */
 	private static readonly _instance = new ApplicationWindow();
 
+	/** ウィンドウの位置 */
 	private readonly _position = { left: 0, top: 0 };
 
 	/**
@@ -193,6 +197,17 @@ export class ApplicationWindow {
 	}
 
 	/**
+	 * ウィンドウのスクリーン座標が変更されたとき
+	 */
+	private static onMoveWindow(): void {
+
+		Logger.trace("EVENT: [move]");
+
+		// アプリケーションの状態を保存します。
+		Application.getInstance().saveAppStatus();
+	}
+
+	/**
 	 * ウィンドウを作成します。
 	 * @returns electron.BrowserWindow
 	 */
@@ -228,6 +243,8 @@ export class ApplicationWindow {
 		window.on("closed", ApplicationWindow.onClosed);
 		// ウィンドウのリサイズ
 		window.on("will-resize", ApplicationWindow.onWindowResize);
+		// ウィンドウの移動
+		window.on("move", ApplicationWindow.onMoveWindow);
 		// 可視化されるときの処理(？)
 		window.once("ready-to-show", ApplicationWindow.onReadyToShow);
 		this._window = window;
@@ -239,6 +256,8 @@ export class ApplicationWindow {
 	 */
 	private close(): void {
 
+		if (!this._window)
+			return;
 		this._window = null;
 	}
 }
