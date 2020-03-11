@@ -1,6 +1,5 @@
 import { readFileSync } from "fs";
 import jsyaml from "js-yaml";
-import { app } from "electron";
 import { Logger } from "./Logger";
 import { CommandlineArguments } from "./CommandlineArguments";
 
@@ -26,7 +25,6 @@ export class ConfigurationSettings {
 
 		if (ConfigurationSettings._instance)
 			return ConfigurationSettings._instance;
-
 		// コンフィギュレーション
 		const conf = new ConfigurationSettings();
 		conf._configure("conf/settings.yml");
@@ -34,7 +32,7 @@ export class ConfigurationSettings {
 		return conf;
 	}
 
-	private _configure(path: string) {
+	private _configure(path: string): void {
 
 		try {
 			Logger.trace("<ConfigurationSettings._configure()> $$$ begin configuration $$$");
