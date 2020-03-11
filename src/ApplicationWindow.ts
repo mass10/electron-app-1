@@ -33,7 +33,7 @@ export class WindowSnapshot {
 			this._settings = yaml;
 		}
 		catch (e) {
-			Logger.trace("スナップショットファイルをオープンできませんでした。理由: ", e);
+			Logger.trace("<WindowSnapshot.constructor()> スナップショットファイルをオープンできませんでした。理由: ", e);
 		}
 	}
 
@@ -221,7 +221,7 @@ export class ApplicationWindow {
 		const conf = ConfigurationSettings.getInstance();
 		// ウィンドウの状態を復元します。
 		const windowState = new WindowSnapshot();
-		Logger.trace("ウィンドウ初期状態: ");
+		Logger.trace("<WindowSnapshot.createWindow()> ウィンドウ初期状態: ");
 		console.log(windowState);
 		const parameters = {
 			width: windowState.get("width") || 800,
