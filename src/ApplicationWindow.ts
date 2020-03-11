@@ -132,22 +132,22 @@ export class ApplicationWindow {
 
 		// ウィンドウの大きさ
 		const size = window.getContentSize();
-		Logger.trace("ウィンドウの大きさ: ", size);
+		// Logger.trace("ウィンドウの大きさ: ", size);
 
 		// ウィンドウの位置
 		if (window.isVisible()) {
 			const position = window.getPosition();
-			Logger.trace("ウィンドウの位置: left: ", position[0], ", top: ", position[1]);
+			// Logger.trace("ウィンドウの位置: left: ", position[0], ", top: ", position[1]);
 			this._position.left = position[0];
 			this._position.top = position[1];
 		}
 		else {
-			Logger.trace("ウィンドウの位置: (invisible)");
+			// Logger.trace("ウィンドウの位置: (invisible)");
 		}
 
 		// フルスクリーン
 		const fullscreen = window.isFullScreen();
-		Logger.trace("フルスクリーン: ", fullscreen);
+		// Logger.trace("フルスクリーン: ", fullscreen);
 
 		const windowState = {
 			width: `${size[0]}`,
@@ -191,7 +191,7 @@ export class ApplicationWindow {
 	 */
 	private static onWindowResize(): void {
 
-		Logger.trace("EVENT: [will-resize]");
+		// Logger.trace("EVENT: [will-resize]");
 
 		// アプリケーションの状態を保存します。
 		Application.getInstance().saveAppStatus();
@@ -202,7 +202,7 @@ export class ApplicationWindow {
 	 */
 	private static onMoveWindow(): void {
 
-		Logger.trace("EVENT: [move]");
+		// Logger.trace("EVENT: [move]");
 
 		// アプリケーションの状態を保存します。
 		Application.getInstance().saveAppStatus();
