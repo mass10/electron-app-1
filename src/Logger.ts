@@ -24,7 +24,7 @@ export class Logger {
 		params.forEach(e => {
 			line += e;
 		});
-		appendFileSync("electron-app-1.log", line + "\n");
+		appendFileSync(".electron-app-1.log", line + "\n");
 
 		// 標準出力にも書き込み
 		console.log(line);
