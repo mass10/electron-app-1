@@ -9,14 +9,19 @@ import { CommandlineArguments } from "./CommandlineArguments";
  */
 export class ConfigurationSettings {
 
+	/** 唯一のインスタンス */
 	private static _instance: ConfigurationSettings | null = null;
 
-	public aaa: string = "";
-
-	private construct() {
+	/**
+	 * コンストラクター
+	 */
+	private constructor() {
 
 	}
 	
+	/**
+	 * インスタンスを返します。
+	 */
 	public static getInstance(): ConfigurationSettings {
 
 		if (ConfigurationSettings._instance)
@@ -32,14 +37,11 @@ export class ConfigurationSettings {
 	private _configure(path: string) {
 
 		try {
-			Logger.trace("$$$ begin configuration $$$");
+			Logger.trace("<ConfigurationSettings._configure()> $$$ begin configuration $$$");
+			Logger.trace("<ConfigurationSettings._configure()> path: [%s]", path);
 			const content = readFileSync(path, { encoding: "utf-8" });
 			const tree = jsyaml.safeLoad(content);
-			this.aaa = tree.aaa ?? "";
 			const args = new CommandlineArguments();
-			if (args.get("--aaa")) {
-				this.aaa = args.get("--aaa");
-			}
 		}
 		catch (e) {
 			if (e instanceof Error) {
