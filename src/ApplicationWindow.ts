@@ -1,6 +1,6 @@
 import electron from 'electron';
 import { ConfigurationSettings } from './ConfigurationSettings'
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { Logger } from './Logger';
 import jsyaml from 'js-yaml';
 import { Application } from './Application';
@@ -64,6 +64,7 @@ export class WindowSnapshot {
 
 		Logger.trace(["<WindowSnapshot.save()>"]);
 		const content = jsyaml.safeDump(this._settings);
+		mkdirSync("conf");
 		writeFileSync("conf/.application-settings-snapshot.yml", content, { flag: "w" });
 	}
 }
