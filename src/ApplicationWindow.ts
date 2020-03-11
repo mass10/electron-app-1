@@ -8,13 +8,12 @@ import { Application } from './Application';
 /**
  * スナップショット属性のキー
  */
-export enum WindowSnapshotKeys {
-	width = "width",
-	height = "height",
-	left = "left",
-	top = "top",
-	fullscreen = "fullscreen"
-}
+export type WindowSnapshotKey =
+	"width" |
+	"height" |
+	"left" |
+	"top" |
+	"fullscreen";
 
 /**
  * ウィンドウの状態を格納するクラスです。前回終了時の状態を復元するために利用されます。
@@ -43,7 +42,7 @@ export class WindowSnapshot {
 	 * @param key 
 	 * @param value 
 	 */
-	public set(key: WindowSnapshotKeys, value: any): void {
+	public set(key: WindowSnapshotKey, value: any): void {
 
 		this._settings[key] = value;
 	}
@@ -52,7 +51,7 @@ export class WindowSnapshot {
 	 * スナップショットから値を取り出します。
 	 * @param key 
 	 */
-	public get(key: WindowSnapshotKeys): any {
+	public get(key: WindowSnapshotKey): any {
 
 		return this._settings[key];
 	}
@@ -78,7 +77,7 @@ export type WindowParameter = {
 	height: string;
 	left: string;
 	top: string;
-	fullscreen: string;
+	fullscreen: boolean | null;
 }
 
 /**
@@ -127,7 +126,7 @@ export class ApplicationWindow {
 		const window = this.getWindow();
 
 		if (!window)
-			return { width: "", height: "", left: "", top: "", fullscreen: "" };
+			return { width: "", height: "", left: "", top: "", fullscreen: null };
 
 		// ウィンドウの大きさ
 		const size = window.getContentSize();
@@ -153,7 +152,7 @@ export class ApplicationWindow {
 			height: `${size[1]}`,
 			left: `${this._position.left}`,
 			top: `${this._position.top}`,
-			fullscreen: `${fullscreen}`
+			fullscreen: fullscreen
 		};
 		return windowState;
 	}
@@ -222,11 +221,11 @@ export class ApplicationWindow {
 		Logger.trace("ウィンドウ初期状態: ");
 		console.log(windowState);
 		const parameters = {
-			width: windowState.get(WindowSnapshotKeys.width) || 800,
-			height: windowState.get(WindowSnapshotKeys.height) || 600,
-			left: windowState.get(WindowSnapshotKeys.left) ?? 0,
-			top: windowState.get(WindowSnapshotKeys.top) ?? 0,
-			fullscreen: windowState.get(WindowSnapshotKeys.fullscreen) ?? false,
+			width: windowState.get("width") || 800,
+			height: windowState.get("height") || 600,
+			left: windowState.get("left") ?? 0,
+			top: windowState.get("top") ?? 0,
+			fullscreen: windowState.get("fullscreen") ?? false,
 			webPreferences: {
 				nodeIntegration: true,
 				preload: 'dist/preload.js'
@@ -235,7 +234,10 @@ export class ApplicationWindow {
 		// アプリケーションのメインウィンドウです。
 		const window = new electron.BrowserWindow(parameters);
 		// メインウィンドウで index.html を開きます。
-		window.loadFile('./index.html');
+		// window.loadFile('./index.html');
+		// window.loadURL("https://dev-editor.techtouch.jp");
+		window.loadURL("http://localhost:3000");
+		// alert("http://localhost:3000");
 		// Developer Tool を開きます。
 		if (false)
 			window.webContents.openDevTools();
