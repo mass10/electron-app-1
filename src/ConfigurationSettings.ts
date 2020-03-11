@@ -4,7 +4,9 @@ import { app } from "electron";
 import { Logger } from "./Logger";
 import { CommandlineArguments } from "./CommandlineArguments";
 
-// コンフィギュレーション
+/**
+ * コンフィギュレーション
+ */
 export class ConfigurationSettings {
 
 	private static _instance: ConfigurationSettings | null = null;
