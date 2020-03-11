@@ -1,17 +1,28 @@
 import { appendFileSync } from "fs";
 import { Timestamp } from "./Timestamp";
 
-// ロギングクラス
+/**
+ * ロギングクラス
+ */
 export class Logger {
 
+	/**
+	 * コントラクターは非公開
+	 */
 	private constructor() {
 
 	}
 
+	/**
+	 *
+	 */
 	private static roateLogs(): void {
 
 	}
 
+	/**
+	 *
+	 */
 	public static trace(...params: any[]): void {
 
 		// ログファイルをローテーション
