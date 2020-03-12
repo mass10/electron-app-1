@@ -129,8 +129,7 @@ export class Application {
 	 */
 	public run(): void {
 
-		Logger.trace(["<Application.run()> ### START ###"]);
-
+		Logger.trace("<Application.run()> ### START ###");
 		const conf = ConfigurationSettings.getInstance();
 
 		const app = this.getElectronApp();
