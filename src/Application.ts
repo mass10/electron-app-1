@@ -1,7 +1,9 @@
-import electron from 'electron';
-import { ConfigurationSettings } from './ConfigurationSettings'
-import { Logger } from './Logger';
-import { ApplicationWindow, WindowSnapshot, WindowSnapshotKey } from './ApplicationWindow';
+import electron from "electron";
+import { ConfigurationSettings } from "./ConfigurationSettings"
+import { Logger } from "./Logger";
+import { ApplicationWindow, WindowSnapshot, WindowSnapshotKey } from "./ApplicationWindow";
+import path from "path";
+import os from "os";
 
 /**
  * アプリケーション本体のクラス
@@ -9,7 +11,7 @@ import { ApplicationWindow, WindowSnapshot, WindowSnapshotKey } from './Applicat
 export class Application {
 
 	/** electron.App */
-	private _application: electron.App | null = null;
+	private readonly _application = electron.app;
 
 	/** 唯一のインスタンス */
 	private static readonly _instance: Application = new Application();
@@ -26,8 +28,6 @@ export class Application {
 	 */
 	private getElectronApp(): electron.App {
 
-		if (!this._application)
-			this._application = electron.app;
 		return this._application;
 	}
 
@@ -49,24 +49,19 @@ export class Application {
 		}
 	}
 
-	public static onApplicationReady(): void {
+	private static onApplicationReady(): void {
 
-		Logger.trace(["<Application.onApplicationReady()>"]);
-
+		Logger.trace("<Application.onApplicationReady()>");
 		ApplicationWindow.getInstance().createWindow();
 	}
 
-	public static onApplicationActivate(): void {
+	private static onApplicationActivate(): void {
 
 		Logger.trace(["<Application.onApplicationActivate()>"]);
-
 		ApplicationWindow.getInstance().createWindow();
 	}
 
-	public static onApplicationFullScreen(): void {
-	}
-
-	public static onApplicationWillQuit(): void {
+	private static onApplicationWillQuit(): void {
 
 		Logger.trace(["<Application.onApplicationWillQuit()>"]);
 	}
@@ -116,7 +111,7 @@ export class Application {
 	 */
 	public quit(): void {
 
-		Logger.trace(["<Application.quit()>"]);
+		Logger.trace("<Application.quit()>");
 
 		// アプリケーションの終了状態を保存します。
 		this.saveAppStatus(true);
@@ -141,7 +136,6 @@ export class Application {
 		app.on('activate', Application.onApplicationActivate);
 		// ？？
 		app.on('will-quit', Application.onApplicationWillQuit);
-		// app.on("enter-full-screen", Application.onApplicationFullScreen);
 
 		Logger.trace(["<Application.run()> --- END ---"]);
 	}
