@@ -1,9 +1,9 @@
-import electron from 'electron';
-import { ConfigurationSettings } from './ConfigurationSettings'
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
-import { Logger } from './Logger';
-import jsyaml from 'js-yaml';
-import { Application } from './Application';
+import electron from "electron";
+import { ConfigurationSettings } from "./ConfigurationSettings";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
+import { Logger } from "./Logger";
+import jsyaml from "js-yaml";
+import { Application } from "./Application";
 
 /**
  * スナップショット属性のキー
@@ -56,6 +56,37 @@ export class WindowSnapshot {
 	public get(key: WindowSnapshotKey): any {
 
 		return this._settings[key];
+	}
+
+	/**
+	 * スナップショットから値を取り出します。
+	 * 
+	 * @param key 
+	 */
+	public getNumber(key: WindowSnapshotKey): number {
+
+		try {
+			return parseInt(this._settings[key]);
+		}
+		catch {
+			return 0;
+		}
+	}
+
+	/**
+	 * スナップショットから値を取り出します。
+	 * 
+	 * @param key 
+	 */
+	public getBoolean(key: WindowSnapshotKey): boolean {
+
+		try {
+			const value = ("" + this._settings[key]).toLowerCase();
+			return value === "true" || value === "1";
+		}
+		catch {
+			return false;
+		}
 	}
 
 	/**
@@ -191,8 +222,6 @@ export class ApplicationWindow {
 	 */
 	private static onWindowResize(): void {
 
-		// Logger.trace("EVENT: [will-resize]");
-
 		// アプリケーションの状態を保存します。
 		Application.getInstance().saveAppStatus();
 	}
@@ -201,8 +230,6 @@ export class ApplicationWindow {
 	 * ウィンドウのスクリーン座標が変更されたとき
 	 */
 	private static onMoveWindow(): void {
-
-		// Logger.trace("EVENT: [move]");
 
 		// アプリケーションの状態を保存します。
 		Application.getInstance().saveAppStatus();
@@ -224,11 +251,11 @@ export class ApplicationWindow {
 		Logger.trace("<WindowSnapshot.createWindow()> ウィンドウ初期状態: ");
 		console.log(windowState);
 		const parameters = {
-			width: windowState.get("width") || 800,
-			height: windowState.get("height") || 600,
-			left: windowState.get("left") ?? 0,
-			top: windowState.get("top") ?? 0,
-			fullscreen: windowState.get("fullscreen") ?? false,
+			width: windowState.getNumber("width") || 800,
+			height: windowState.getNumber("height") || 600,
+			left: windowState.getNumber("left") ?? 0,
+			top: windowState.getNumber("top") ?? 0,
+			fullscreen: windowState.getBoolean("fullscreen") ?? false,
 			webPreferences: {
 				nodeIntegration: true,
 				preload: 'dist/preload.js'
@@ -249,10 +276,28 @@ export class ApplicationWindow {
 		window.on("will-resize", ApplicationWindow.onWindowResize);
 		// ウィンドウの移動
 		window.on("move", ApplicationWindow.onMoveWindow);
+		// フルスクリーン
+		window.on("enter-full-screen", ApplicationWindow.onWindowResize);
+		// フルスクリーン
+		window.on("leave-full-screen", ApplicationWindow.onWindowResize);
 		// 可視化されるときの処理(？)
 		window.once("ready-to-show", ApplicationWindow.onReadyToShow);
 		this._window = window;
 		return window;
+	}
+
+	/**
+	 * 開発者ツールを開きます。
+	 */
+	public openDevTools(): void {
+		const window = this.getWindow();
+		if (!window)
+			return;
+		if (window.webContents.isDevToolsOpened())
+			return;
+		if (window.webContents.isDevToolsFocused())
+			return;
+		window.webContents.openDevTools();
 	}
 
 	/**

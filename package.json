@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "js-yaml": "^3.13.1",
+    "path": "^0.12.7",
     "typescript": "^3.7.4"
   },
   "build": {

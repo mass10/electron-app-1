@@ -1,1 +1,2 @@
-@yarn tsc
+@call yarn install
+@call yarn tsc
