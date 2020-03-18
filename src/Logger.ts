@@ -40,4 +40,22 @@ export class Logger {
 		// 標準出力にも書き込み
 		console.log(line);
 	}
+
+	/**
+	 *
+	 */
+	public static error(...params: any[]): void {
+		// ログファイルをローテーション
+		Logger.roateLogs();
+		// ロギング
+		let line = "";
+		line += Timestamp.timestamp0();
+		line += " [ERROR] ";
+		params.forEach(e => {
+			line += e;
+		});
+		appendFileSync(".electron-app-1.log", line + "\n");
+		// 標準出力にも書き込み
+		console.error(line);
+	}
 }
