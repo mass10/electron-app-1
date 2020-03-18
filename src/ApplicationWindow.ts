@@ -5,6 +5,7 @@ import { Logger } from "./Logger";
 import jsyaml from "js-yaml";
 import path from "path";
 import { Application } from "./Application";
+import { CommandlineArguments } from "./CommandlineArguments";
 
 /**
  * スナップショット属性のキー
@@ -268,8 +269,10 @@ export class ApplicationWindow {
 		window.loadURL("http://localhost:3000");
 		// alert("http://localhost:3000");
 		// Developer Tool を開きます。
-		if (false)
+		const args = new CommandlineArguments();
+		if (args.getBoolean("--open-devtools")) {
 			window.webContents.openDevTools();
+		}
 		// 閉じられるときの処理です。
 		window.on("closed", ApplicationWindow.onClosed);
 		// ウィンドウのリサイズ
