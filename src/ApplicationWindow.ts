@@ -3,6 +3,7 @@ import { ConfigurationSettings } from "./ConfigurationSettings";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
 import { Logger } from "./Logger";
 import jsyaml from "js-yaml";
+import path from "path";
 import { Application } from "./Application";
 
 /**
@@ -248,8 +249,6 @@ export class ApplicationWindow {
 		const conf = ConfigurationSettings.getInstance();
 		// ウィンドウの状態を復元します。
 		const windowState = new WindowSnapshot();
-		Logger.trace("<WindowSnapshot.createWindow()> ウィンドウ初期状態: ");
-		console.log(windowState);
 		const parameters = {
 			width: windowState.getNumber("width") || 800,
 			height: windowState.getNumber("height") || 600,
@@ -258,10 +257,11 @@ export class ApplicationWindow {
 			fullscreen: windowState.getBoolean("fullscreen") ?? false,
 			webPreferences: {
 				nodeIntegration: true,
-				preload: 'dist/preload.js'
+				preload: path.resolve("dist/preload.js")
 			}
 		};
 		// アプリケーションのメインウィンドウです。
+		Logger.trace("<WindowSnapshot.createWindow()> Window state ", JSON.stringify(parameters));
 		const window = new electron.BrowserWindow(parameters);
 		// メインウィンドウで index.html を開きます。
 		// window.loadFile('./index.html');
