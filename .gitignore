@@ -2,3 +2,4 @@ node_modules
 dist
 conf/.application-settings-snapshot.yml
 .electron-app-1.log
+yarn-error.log
