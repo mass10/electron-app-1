@@ -300,7 +300,7 @@ export class ApplicationWindow {
 			return;
 		if (window.webContents.isDevToolsFocused())
 			return;
-		window.webContents.openDevTools();
+		window.webContents.openDevTools({ mode: "detach" });
 	}
 
 	/**
