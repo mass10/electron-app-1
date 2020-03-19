@@ -78,6 +78,17 @@ export class CommandlineArguments {
 	}
 
 	/**
+	 * 取り出し
+	 * 
+	 * @param key 
+	 */
+	public getBoolean(key: string): boolean {
+
+		const value = ("" + this._map.get(key)).toLowerCase();
+		return value === "true" || value === "1";
+	}
+
+	/**
 	 * デバッグ用
 	 */
 	public dump(): void {
