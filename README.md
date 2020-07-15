@@ -5,7 +5,7 @@ yarn init
 yarn add electron
 yarn add typescript
 yarn tsc --init
-yarn add -D electron-builder
+yarn add --dev electron-builder
 ```
 
 # アプリケーションをビルドする。
