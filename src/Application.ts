@@ -1,9 +1,29 @@
 import electron from "electron";
 import { ConfigurationSettings } from "./ConfigurationSettings"
 import { Logger } from "./Logger";
-import { ApplicationWindow, WindowSnapshot, WindowSnapshotKey } from "./ApplicationWindow";
+import { ApplicationWindow } from "./ApplicationWindow";
 import path from "path";
 import os from "os";
+import { CommandlineArguments } from "./CommandlineArguments";
+import { WindowSnapshot } from "./WindowSnapshot";
+import child_process from "child_process";
+
+/** ネットワーク関連の詳細ログ */
+let _netlog = false;
+
+async function startNetLogging(): Promise<void> {
+	stopNetLogging();
+	_netlog = true;	
+	await electron.netLog.startLogging('./netlog');
+	console.log('Net-logs written to ./netlog');
+}
+
+function stopNetLogging(): void {
+	if (_netlog === false)
+		return;
+	electron.netLog.stopLogging();
+	_netlog = false;
+}
 
 /**
  * アプリケーション本体のクラス
@@ -49,21 +69,50 @@ export class Application {
 		}
 	}
 
-	private static onApplicationReady(): void {
+	/** ネットワーク関連の詳細ログ */
+	private static async setupLogging() {
+
+		return;
+		startNetLogging();
+	}
+
+	private static async onApplicationReady() {
 
 		Logger.trace("<Application.onApplicationReady()>");
-		ApplicationWindow.getInstance().createWindow();
+
+		await Application.setupLogging();
+
+		const window = ApplicationWindow.getInstance().createWindow();
+
+		// ショートカットキーの登録(ダメ)
+		electron.globalShortcut.register("F12", () => {
+			ApplicationWindow.getInstance().openDevTools();
+		});
+		ApplicationWindow.getInstance().openDevTools();
+
+		// temporary data ??
+		{
+			const userData = Application.getInstance().getElectronApp().getPath("userData");
+			Logger.trace(`userData is ${userData}`);
+		}
+
+		// Cookie ??
+		if (false) electron.Session.defaultSession.cookies.on;
+
+		// ========== 拡張をロードします ==========
+		if (false) await Application.getInstance().loadExtensions();
 	}
 
 	private static onApplicationActivate(): void {
 
-		Logger.trace(["<Application.onApplicationActivate()>"]);
+		Logger.trace("<Application.onApplicationActivate()>");
 		ApplicationWindow.getInstance().createWindow();
 	}
 
 	private static onApplicationWillQuit(): void {
 
-		Logger.trace(["<Application.onApplicationWillQuit()>"]);
+		Logger.trace("<Application.onApplicationWillQuit()>");
+		stopNetLogging();
 	}
 
 	private readonly _temp = new WindowSnapshot();
@@ -120,22 +169,59 @@ export class Application {
 	}
 
 	/**
+	 * 拡張をロードします。
+	 */
+	private async loadExtensions(): Promise<void> {
+		const currentDir = path.resolve(".");
+		Logger.trace("Your current directory is ... [", currentDir, "].");
+		const editorPath = path.join(__dirname, "my-extension-1");
+		electron.BrowserWindow.addExtension(editorPath);
+	}
+
+	/**
 	 * アプリケーションを実行します。
 	 */
 	public run(): void {
 
 		Logger.trace("<Application.run()> ### START ###");
+
+		process.on("uncaughtException", (err) => {
+			const messageBoxOptions = {
+				type: "error",
+				title: "Error in Main process",
+				message: "Something failed"
+			};
+			electron.dialog.showMessageBox(messageBoxOptions);
+			throw err;
+		});
+
 		const conf = ConfigurationSettings.getInstance();
 
+		const args = new CommandlineArguments();
+
 		const app = this.getElectronApp();
+		// なんか8からデフォルト値が変わったという警告が出たので追加した
+		app.allowRendererProcessReuse = true;
+
+		if (args.getBoolean("--open-devtools")) {
+			// app.def
+		}
+
+		{
+			const path = app.getPath("userData");
+			Logger.trace(`userData is: [${path}]`);
+		}
+
 		// アプリケーションが準備できた？
 		app.on('ready', Application.onApplicationReady);
 		// ウィンドウが閉じられた？
 		app.on('window-all-closed', Application.onApplicationClose);
 		// ウィンドウがアクティブになった？
 		app.on('activate', Application.onApplicationActivate);
-		// ？？
+		// ？
 		app.on('will-quit', Application.onApplicationWillQuit);
+		// IPC message
+		electron.ipcMain.on("#random", Application.onIPCMessage);
 
 		Logger.trace(["<Application.run()> --- END ---"]);
 	}
@@ -145,7 +231,12 @@ export class Application {
 	 * どこから呼び出されても同一のインスタンスを返します。
 	 */
 	public static getInstance(): Application {
-
 		return Application._instance;
+	}
+
+	private static onIPCMessage(event: electron.IpcMainEvent, args: any[]): void {
+		const message = `${args}`;
+		Logger.trace("<Application.onIPCMessage()> RECV! [" + message + "] ", JSON.stringify(args));
+		event.returnValue = "OK";
 	}
 }
