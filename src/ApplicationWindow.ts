@@ -1,108 +1,11 @@
 import electron from "electron";
 import { ConfigurationSettings } from "./ConfigurationSettings";
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
 import { Logger } from "./Logger";
-import jsyaml from "js-yaml";
 import path from "path";
 import { Application } from "./Application";
 import { CommandlineArguments } from "./CommandlineArguments";
-
-/**
- * スナップショット属性のキー
- */
-export type WindowSnapshotKey =
-	"width" |
-	"height" |
-	"left" |
-	"top" |
-	"fullscreen";
-
-/**
- * ウィンドウの状態を格納するクラスです。前回終了時の状態を復元するために利用されます。
- */
-export class WindowSnapshot {
-
-	private _settings: any = {};
-
-	/**
-	 * コンストラクター
-	 */
-	public constructor() {
-
-		try {
-			const content = readFileSync("conf/.application-settings-snapshot.yml", { encoding: "utf-8" });
-			const yaml = jsyaml.safeLoad(content);
-			this._settings = yaml;
-		}
-		catch (e) {
-			Logger.trace("<WindowSnapshot.constructor()> スナップショットファイルをオープンできませんでした。理由: ", e);
-		}
-	}
-
-	/**
-	 * スナップショットに値を保管します。
-	 * 
-	 * @param key 
-	 * @param value 
-	 */
-	public set(key: WindowSnapshotKey, value: any): void {
-
-		this._settings[key] = value;
-	}
-
-	/**
-	 * スナップショットから値を取り出します。
-	 * 
-	 * @param key 
-	 */
-	public get(key: WindowSnapshotKey): any {
-
-		return this._settings[key];
-	}
-
-	/**
-	 * スナップショットから値を取り出します。
-	 * 
-	 * @param key 
-	 */
-	public getNumber(key: WindowSnapshotKey): number {
-
-		try {
-			return parseInt(this._settings[key]);
-		}
-		catch {
-			return 0;
-		}
-	}
-
-	/**
-	 * スナップショットから値を取り出します。
-	 * 
-	 * @param key 
-	 */
-	public getBoolean(key: WindowSnapshotKey): boolean {
-
-		try {
-			const value = ("" + this._settings[key]).toLowerCase();
-			return value === "true" || value === "1";
-		}
-		catch {
-			return false;
-		}
-	}
-
-	/**
-	 * スナップショットをファイルに書き込みます。
-	 */
-	public save(): void {
-
-		Logger.trace(["<WindowSnapshot.save()>"]);
-		const content = jsyaml.safeDump(this._settings);
-		if (!existsSync("conf"))
-			mkdirSync("conf");
-		writeFileSync("conf/.application-settings-snapshot.yml", content, { flag: "w" });
-	}
-}
+import { WindowSnapshot } from "./WindowSnapshot";
+import fs from "fs";
 
 /**
  * ウィンドウの状態を表現する項目名
@@ -113,6 +16,21 @@ export type WindowParameter = {
 	left: string;
 	top: string;
 	fullscreen: boolean | null;
+}
+
+/**
+ * preload.js のパスを返します。
+ * 
+ * 開発時と Electron アプリケーションにパッケージされた時でパスに違いがあります。
+ */
+function getPreloadScriptPath(): string {
+	let distPreloadjs = path.resolve("./dist/preload.js");
+	if (fs.existsSync(distPreloadjs)) {
+		// 開発時
+		return distPreloadjs
+	}
+	// インストールされた後
+	return "dist/preload.js";
 }
 
 /**
@@ -212,6 +130,25 @@ export class ApplicationWindow {
 	}
 
 	/**
+	 * システムのショートカットキー
+	 * 
+	 * @param e 
+	 * @param cmd 
+	 */
+	private static onAppCommand(e: Event, cmd: string): void {
+
+		const window = ApplicationWindow.getInstance().getWindow();
+		if (!window)
+			return;
+
+		// Navigate the window back when the user hits their mouse back button
+		if (cmd === 'browser-backward') {
+			if (window.webContents.canGoBack())
+				window.webContents.goBack();
+		}
+	}
+
+	/**
 	 * ウィンドウを返します。
 	 */
 	private getWindow(): electron.BrowserWindow | null {
@@ -257,22 +194,31 @@ export class ApplicationWindow {
 			top: windowState.getNumber("top") ?? 0,
 			fullscreen: windowState.getBoolean("fullscreen") ?? false,
 			webPreferences: {
-				nodeIntegration: true,
-				preload: path.resolve("dist/preload.js")
+				nodeIntegration: false,
+				contextIsolation: true,
+				preload: "preload.js" //getPreloadScriptPath()
 			}
-		};
+		} as electron.BrowserWindowConstructorOptions;
 		// アプリケーションのメインウィンドウです。
 		Logger.trace("<WindowSnapshot.createWindow()> Window state ", JSON.stringify(parameters));
 		const window = new electron.BrowserWindow(parameters);
+		{
+			const pathname = path.resolve("./index.html");
+			const state = fs.existsSync(pathname);
+			Logger.trace(`${pathname} が存在しているかチェック ... ${state}`);
+		}
 		// メインウィンドウで index.html を開きます。
-		// window.loadFile('./index.html');
-		window.loadURL("http://localhost:3000");
-		// alert("http://localhost:3000");
+		window.loadFile("./index.html");
+		// window.loadURL("http://localhost:3000");
+		// window.loadURL("https://192.168.56.101");
+		// window.loadURL("https://127.0.0.1");
+		// window.loadURL("http://127.0.0.1");
 		// Developer Tool を開きます。
 		const args = new CommandlineArguments();
 		if (args.getBoolean("--open-devtools")) {
 			window.webContents.openDevTools();
 		}
+		// window.webContents.id
 		// 閉じられるときの処理です。
 		window.on("closed", ApplicationWindow.onClosed);
 		// ウィンドウのリサイズ
@@ -285,6 +231,8 @@ export class ApplicationWindow {
 		window.on("leave-full-screen", ApplicationWindow.onWindowResize);
 		// 可視化されるときの処理(？)
 		window.once("ready-to-show", ApplicationWindow.onReadyToShow);
+		// アプリケーションのコマンド
+		window.on("app-command", ApplicationWindow.onAppCommand);
 		this._window = window;
 		return window;
 	}
