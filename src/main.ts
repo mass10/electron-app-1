@@ -1,22 +1,33 @@
 import { Application } from "./Application";
 import { Logger } from "./Logger";
-// import log from "electron-log";
+import log from "electron-log";
+
+function init(): void {
+
+	return;
+
+	console.log = log.log;
+	log.info("ロガー置き換え");
+}
 
 /**
  * エントリーポイントです。ここからアプリケーションが開始されます。
  */
-function main() {
+function main(): void {
 
-	// if (false) {
-	// 	console.log = log.log;
-	// 	log.info("### start ###");
-	// 	log.info("ロガー！！！");
-	// 	log.info("--- end ---");
-	// }
+	try {
 
-	Logger.trace("<main()> called.");
-	const app = Application.getInstance();
-	app.run();
+		init();
+
+		log.info("### start ###");
+		Logger.trace("<main()> called.");
+		const app = Application.getInstance();
+		app.run();
+		log.info("--- end ---");
+	}
+	catch (e) {
+		console.error(e);
+	}
 }
 
 // ここから開始(※package.json に定義)
