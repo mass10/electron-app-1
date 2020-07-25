@@ -185,6 +185,7 @@ export class Application {
 
 		Logger.trace("<Application.run()> ### START ###");
 
+		// 実行時の予期しない例外をキャッチする方法？？
 		process.on("uncaughtException", (err) => {
 			const messageBoxOptions = {
 				type: "error",
@@ -197,7 +198,7 @@ export class Application {
 
 		const conf = ConfigurationSettings.getInstance();
 
-		const args = new CommandlineArguments();
+		const args = CommandlineArguments.getInstance();
 
 		const app = this.getElectronApp();
 		// なんか8からデフォルト値が変わったという警告が出たので追加した

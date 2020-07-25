@@ -1,5 +1,7 @@
 import { Logger } from "./Logger";
 
+let _conf: CommandlineArguments | null = null;
+
 /**
  * コマンドライン引数の解析器
  */
@@ -10,9 +12,15 @@ export class CommandlineArguments {
 	/**
 	 * コンストラクター
 	 */
-	public constructor() {
+	private constructor() {
 
 		this._configure();
+	}
+
+	public static getInstance(): CommandlineArguments {
+		if (_conf === null)
+			_conf = new CommandlineArguments();
+		return _conf;
 	}
 
 	/**

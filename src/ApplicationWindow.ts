@@ -184,6 +184,7 @@ export class ApplicationWindow {
 		if (this._window)
 			return this._window;
 		// コンフィギュレーション
+		Logger.trace("コンフィギュレーション");
 		const conf = ConfigurationSettings.getInstance();
 		// ウィンドウの状態を復元します。
 		const windowState = new WindowSnapshot();
@@ -214,7 +215,7 @@ export class ApplicationWindow {
 		// window.loadURL("https://127.0.0.1");
 		// window.loadURL("http://127.0.0.1");
 		// Developer Tool を開きます。
-		const args = new CommandlineArguments();
+		const args = CommandlineArguments.getInstance();
 		if (args.getBoolean("--open-devtools")) {
 			window.webContents.openDevTools();
 		}

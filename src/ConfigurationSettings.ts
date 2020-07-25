@@ -39,7 +39,7 @@ export class ConfigurationSettings {
 			Logger.trace("<ConfigurationSettings._configure()> path: [%s]", path);
 			const content = readFileSync(path, { encoding: "utf-8" });
 			const tree = jsyaml.safeLoad(content);
-			const args = new CommandlineArguments();
+			const args = CommandlineArguments.getInstance();
 		}
 		catch (e) {
 			if (e instanceof Error) {
