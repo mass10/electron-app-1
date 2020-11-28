@@ -19,7 +19,7 @@
     "homepage": "https://github.com/mass10/electron-app-1#readme",
     "devDependencies": {
         "@types/js-yaml": "^3.12.1",
-        "electron": "^9.0.0-beta.14",
+        "electron": "^9.1.1",
         "electron-builder": "^22.4.1"
     },
     "dependencies": {
