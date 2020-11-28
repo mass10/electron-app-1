@@ -6,6 +6,7 @@ import { Application } from "./Application";
 import { CommandlineArguments } from "./CommandlineArguments";
 import { WindowSnapshot } from "./WindowSnapshot";
 import fs from "fs";
+import { InternetExplorer } from "./InternetExplorer";
 
 /**
  * ウィンドウの状態を表現する項目名
@@ -18,19 +19,22 @@ export type WindowParameter = {
 	fullscreen: boolean | null;
 }
 
+function detectPath(relativePath: string): string {
+	let absolutePath = path.resolve(relativePath);
+	if (!fs.existsSync(absolutePath)) return "";
+	Logger.trace(`ファイルを検出した！ ${absolutePath}`);
+	return absolutePath
+}
+
 /**
  * preload.js のパスを返します。
  * 
  * 開発時と Electron アプリケーションにパッケージされた時でパスに違いがあります。
  */
 function getPreloadScriptPath(): string {
-	let distPreloadjs = path.resolve("./dist/preload.js");
-	if (fs.existsSync(distPreloadjs)) {
-		// 開発時
-		return distPreloadjs
-	}
-	// インストールされた後
-	return "dist/preload.js";
+	return detectPath("./preload.js")
+			|| detectPath("./dist/preload.js")
+			|| path.resolve("./preload.js");
 }
 
 /**
@@ -114,9 +118,7 @@ export class ApplicationWindow {
 	 * ウィンドウが閉じられたとき
 	 */
 	private static onClosed(): void {
-
-		Logger.trace("EVENT: [closed]");
-
+		Logger.trace("<ApplicationWindow.onClosed()> EVENT: [closed]");
 		// ウィンドウを閉じます。
 		ApplicationWindow.getInstance().close();
 	}
@@ -125,8 +127,9 @@ export class ApplicationWindow {
 	 * ウィンドウの準備ができたとき
 	 */
 	private static onReadyToShow(): void {
-
-		Logger.trace("EVENT: [ready-to-show]");
+		// ※来ない
+		throw new Error("NOT IMPLEMENTED!!");
+		// Logger.trace("<ApplicationWindow.onReadyToShow()> EVENT: [ready-to-show] ★");
 	}
 
 	/**
@@ -197,7 +200,7 @@ export class ApplicationWindow {
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true,
-				preload: "preload.js" //getPreloadScriptPath()
+				preload: getPreloadScriptPath()
 			}
 		} as electron.BrowserWindowConstructorOptions;
 		// アプリケーションのメインウィンドウです。
@@ -214,6 +217,7 @@ export class ApplicationWindow {
 		// window.loadURL("https://192.168.56.101");
 		// window.loadURL("https://127.0.0.1");
 		// window.loadURL("http://127.0.0.1");
+		// window.loadURL("https://localhost");
 		// Developer Tool を開きます。
 		const args = CommandlineArguments.getInstance();
 		if (args.getBoolean("--open-devtools")) {
