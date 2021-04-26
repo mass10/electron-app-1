@@ -6,7 +6,6 @@ import { Application } from "./Application";
 import { CommandlineArguments } from "./CommandlineArguments";
 import { WindowSnapshot } from "./WindowSnapshot";
 import fs from "fs";
-import { InternetExplorer } from "./InternetExplorer";
 
 /**
  * ウィンドウの状態を表現する項目名
