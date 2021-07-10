@@ -1,3 +1,3 @@
 @SETLOCAL
 @CALL yarn install
-@CALL yarn tsc
+@CALL yarn tsc --build
