@@ -65,12 +65,7 @@
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.12.5.tgz#136d5e6a57a931e1cce6f9d8126aa98a9c92a6bb"
   integrity sha512-JCcp6J0GV66Y4ZMDAQCXot4xprYB+Zfd3meK9+INSJeVZwJmHAW30BBEEkPzXswMXuiyReUGOP3GxrADc9wPww==
 
-"@types/node@*":
-  version "14.0.26"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.26.tgz#22a3b8a46510da8944b67bfc27df02c34a35331c"
-  integrity sha512-W+fpe5s91FBGE0pEa0lnqGLL4USgpLgs4nokw16SrBBco/gQxuua7KnArSEOd5iaMqbbSHV10vUDkJYJJqpXKA==
-
-"@types/node@^14.14.41", "@types/node@^14.6.2":
+"@types/node@*", "@types/node@^14.14.41", "@types/node@^14.6.2":
   version "14.17.9"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.17.9.tgz#b97c057e6138adb7b720df2bd0264b03c9f504fd"
   integrity sha512-CMjgRNsks27IDwI785YMY0KLt3co/c0cQ5foxHYv/shC2w8oOnVwz5Ubq1QG5KzrcW+AXk6gzdnxIkDnTvzu3g==
@@ -554,10 +549,10 @@ electron-publish@22.7.0:
     lazy-val "^1.0.4"
     mime "^2.4.5"
 
-electron@^12.0.5:
-  version "12.0.16"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-12.0.16.tgz#f2e96fe664b305f68d967591ee32e52df085b59f"
-  integrity sha512-h8OKl+/QN31G6jXJsH9ifCBf/iJLlse9sivEFyGsNSb9VZ+y1JPnxtvVqrLwyOXv97XTvOU9DfWogNiKsBHspQ==
+electron@^12.1.0:
+  version "12.1.0"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-12.1.0.tgz#615a7f9dbb2fc79cc72361fba9f39d005c697bca"
+  integrity sha512-joQlYI/nTIrTUldO3GENZ2j225eKar9nTQBSEwSUSWN4h65QGDmXNQ7dbWPmLlkUQWtHhz8lXhFk30OLG9ZjLw==
   dependencies:
     "@electron/get" "^1.0.1"
     "@types/node" "^14.6.2"
