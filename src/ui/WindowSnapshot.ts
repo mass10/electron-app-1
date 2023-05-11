@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
-import { Logger } from "./Logger";
+import { Logger } from "../log/Logger";
 import jsyaml from "js-yaml";
 
 /**
@@ -30,7 +30,7 @@ export class WindowSnapshot {
 			this._settings = yaml;
 		}
 		catch (e) {
-			Logger.trace("<WindowSnapshot.constructor()> スナップショットファイルをオープンできませんでした。理由: ", e);
+			Logger.debug("<WindowSnapshot.constructor()> スナップショットファイルをオープンできませんでした。理由: ", e);
 		}
 	}
 
@@ -91,7 +91,7 @@ export class WindowSnapshot {
 	 */
 	public save(): void {
 
-		Logger.trace(["<WindowSnapshot.save()>"]);
+		Logger.debug(["<WindowSnapshot.save()>"]);
 		const content = jsyaml.safeDump(this._settings);
 		if (!existsSync("conf"))
 			mkdirSync("conf");
