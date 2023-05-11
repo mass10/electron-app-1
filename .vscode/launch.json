@@ -9,7 +9,7 @@
 			"request": "launch",
 			"name": "Electron Main",
 			"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-			"program": "${workspaceFolder}/dist/main.js",
+			"program": "${workspaceFolder}/dist/Main.js",
 			"skipFiles": [
 				"<node_internals>/**"
 			]
