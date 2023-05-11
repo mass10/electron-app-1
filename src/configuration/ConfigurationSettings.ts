@@ -7,24 +7,19 @@ import { CommandlineArguments } from "../util/CommandlineArguments";
  * コンフィギュレーション
  */
 export class ConfigurationSettings {
-
 	/** 唯一のインスタンス */
 	private static _instance: ConfigurationSettings | null = null;
 
 	/**
 	 * コンストラクター
 	 */
-	private constructor() {
+	private constructor() {}
 
-	}
-	
 	/**
 	 * インスタンスを返します。
 	 */
 	public static getInstance(): ConfigurationSettings {
-
-		if (ConfigurationSettings._instance)
-			return ConfigurationSettings._instance;
+		if (ConfigurationSettings._instance) return ConfigurationSettings._instance;
 		// コンフィギュレーション
 		const conf = new ConfigurationSettings();
 		conf._configure("conf/settings.yml");
@@ -33,19 +28,23 @@ export class ConfigurationSettings {
 	}
 
 	private _configure(path: string): void {
-
 		try {
 			Logger.debug("<ConfigurationSettings._configure()> $$$ begin configuration $$$");
 			Logger.debug("<ConfigurationSettings._configure()> path: [%s]", path);
 			const content = readFileSync(path, { encoding: "utf-8" });
 			const tree = jsyaml.safeLoad(content);
 			const args = CommandlineArguments.getInstance();
-		}
-		catch (e) {
+		} catch (e) {
 			if (e instanceof Error) {
-				console.log("[ERROR] configuration error. reason: ", e.message, ", name: ", e.name, ", stack: ", e.stack);
-			}
-			else {
+				console.log(
+					"[ERROR] configuration error. reason: ",
+					e.message,
+					", name: ",
+					e.name,
+					", stack: ",
+					e.stack
+				);
+			} else {
 				console.log("[ERROR] configuration error. reason: ", e);
 			}
 		}
