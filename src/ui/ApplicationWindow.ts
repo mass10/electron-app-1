@@ -16,31 +16,28 @@ export type WindowParameter = {
 	left: string;
 	top: string;
 	fullscreen: boolean | null;
-}
+};
 
 function detectPath(relativePath: string): string {
 	let absolutePath = path.resolve(relativePath);
 	if (!fs.existsSync(absolutePath)) return "";
 	Logger.debug(`ファイルを検出した！ ${absolutePath}`);
-	return absolutePath
+	return absolutePath;
 }
 
 /**
  * preload.js のパスを返します。
- * 
+ *
  * 開発時と Electron アプリケーションにパッケージされた時でパスに違いがあります。
  */
 function getPreloadScriptPath(): string {
-	return detectPath("./preload.js")
-			|| detectPath("./dist/preload.js")
-			|| path.resolve("./preload.js");
+	return detectPath("./preload.js") || detectPath("./dist/preload.js") || path.resolve("./preload.js");
 }
 
 /**
  * ウィンドウクラス
  */
 export class ApplicationWindow {
-
 	/** ウィンドウクラスのインスタンス */
 	private _window: electron.BrowserWindow | null = null;
 
@@ -53,15 +50,12 @@ export class ApplicationWindow {
 	/**
 	 * コンストラクター
 	 */
-	private constructor() {
-
-	}
+	private constructor() {}
 
 	/**
 	 * グローバルなインスタンスを返します。
 	 */
 	public static getInstance(): ApplicationWindow {
-
 		return ApplicationWindow._instance;
 	}
 
@@ -69,7 +63,6 @@ export class ApplicationWindow {
 	 * ウィンドウが可視状態にあるかどうかを調べます。
 	 */
 	public isVisible(): boolean {
-
 		return this.getWindow()?.isVisible() ?? false;
 	}
 
@@ -77,12 +70,10 @@ export class ApplicationWindow {
 	 * ウィンドウの状態を調べます。
 	 */
 	public getCurrentWindowState(): WindowParameter {
-
 		// ウィンドウオブジェクト
 		const window = this.getWindow();
 
-		if (!window)
-			return { width: "", height: "", left: "", top: "", fullscreen: null };
+		if (!window) return { width: "", height: "", left: "", top: "", fullscreen: null };
 
 		// ウィンドウの大きさ
 		const size = window.getContentSize();
@@ -94,8 +85,7 @@ export class ApplicationWindow {
 			// Logger.trace("ウィンドウの位置: left: ", position[0], ", top: ", position[1]);
 			this._position.left = position[0];
 			this._position.top = position[1];
-		}
-		else {
+		} else {
 			// Logger.trace("ウィンドウの位置: (invisible)");
 		}
 
@@ -108,7 +98,7 @@ export class ApplicationWindow {
 			height: `${size[1]}`,
 			left: `${this._position.left}`,
 			top: `${this._position.top}`,
-			fullscreen: fullscreen
+			fullscreen: fullscreen,
 		};
 		return windowState;
 	}
@@ -127,26 +117,24 @@ export class ApplicationWindow {
 	 */
 	private static onReadyToShow(): void {
 		// ※来ない
-		throw new Error("NOT IMPLEMENTED!!");
+		// throw new Error("NOT IMPLEMENTED!!");
 		// Logger.trace("<ApplicationWindow.onReadyToShow()> EVENT: [ready-to-show] ★");
+		ApplicationWindow.getInstance().getWindow()?.show();
 	}
 
 	/**
 	 * システムのショートカットキー
-	 * 
-	 * @param e 
-	 * @param cmd 
+	 *
+	 * @param e
+	 * @param cmd
 	 */
 	private static onAppCommand(e: Event, cmd: string): void {
-
 		const window = ApplicationWindow.getInstance().getWindow();
-		if (!window)
-			return;
+		if (!window) return;
 
 		// Navigate the window back when the user hits their mouse back button
-		if (cmd === 'browser-backward') {
-			if (window.webContents.canGoBack())
-				window.webContents.goBack();
+		if (cmd === "browser-backward") {
+			if (window.webContents.canGoBack()) window.webContents.goBack();
 		}
 	}
 
@@ -154,7 +142,6 @@ export class ApplicationWindow {
 	 * ウィンドウを返します。
 	 */
 	private getWindow(): electron.BrowserWindow | null {
-
 		return this._window;
 	}
 
@@ -162,7 +149,6 @@ export class ApplicationWindow {
 	 * ウィンドウのサイズが変更されたとき
 	 */
 	private static onWindowResize(): void {
-
 		// アプリケーションの状態を保存します。
 		Application.getInstance().saveAppStatus();
 	}
@@ -171,20 +157,17 @@ export class ApplicationWindow {
 	 * ウィンドウのスクリーン座標が変更されたとき
 	 */
 	private static onMoveWindow(): void {
-
 		// アプリケーションの状態を保存します。
 		Application.getInstance().saveAppStatus();
 	}
 
 	/**
 	 * ウィンドウを作成します。
-	 * 
+	 *
 	 * @returns electron.BrowserWindow
 	 */
 	public createWindow(): electron.BrowserWindow {
-
-		if (this._window)
-			return this._window;
+		if (this._window) return this._window;
 		// コンフィギュレーション
 		Logger.debug("コンフィギュレーション");
 		const conf = ConfigurationSettings.getInstance();
@@ -199,8 +182,8 @@ export class ApplicationWindow {
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true,
-				preload: getPreloadScriptPath()
-			}
+				preload: "dist/ui/preload.js",
+			},
 		} as electron.BrowserWindowConstructorOptions;
 		// アプリケーションのメインウィンドウです。
 		Logger.debug("<WindowSnapshot.createWindow()> Window state ", JSON.stringify(parameters));
@@ -246,12 +229,9 @@ export class ApplicationWindow {
 	 */
 	public openDevTools(): void {
 		const window = this.getWindow();
-		if (!window)
-			return;
-		if (window.webContents.isDevToolsOpened())
-			return;
-		if (window.webContents.isDevToolsFocused())
-			return;
+		if (!window) return;
+		if (window.webContents.isDevToolsOpened()) return;
+		if (window.webContents.isDevToolsFocused()) return;
 		window.webContents.openDevTools({ mode: "detach" });
 	}
 
@@ -259,9 +239,7 @@ export class ApplicationWindow {
 	 * ウィンドウを閉じます。
 	 */
 	private close(): void {
-
-		if (!this._window)
-			return;
+		if (!this._window) return;
 		this._window = null;
 	}
 }
