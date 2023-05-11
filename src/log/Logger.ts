@@ -5,20 +5,15 @@ import { Timestamp } from "../util/Timestamp";
  * ロギングクラス
  */
 export class Logger {
-
 	/**
 	 * コントラクターは非公開
 	 */
-	private constructor() {
-
-	}
+	private constructor() {}
 
 	/**
 	 *
 	 */
-	private static roateLogs(): void {
-
-	}
+	private static roateLogs(): void {}
 
 	/**
 	 * デバッグログを出力します。
@@ -27,15 +22,11 @@ export class Logger {
 		// ログファイルをローテーション
 		Logger.roateLogs();
 
-		// ロギング
 		let line = `${Timestamp.timestamp0()} [DEBUG] `;
 		for (const e of params) {
 			line += e;
 		}
-		line += "\n";
-		fs.appendFileSync("electron-app-1.log", line);
-
-		// 標準出力にも書き込み
+		fs.appendFileSync("electron-app-1.log", line + "\n");
 		console.log(line);
 	}
 
@@ -46,15 +37,11 @@ export class Logger {
 		// ログファイルをローテーション
 		Logger.roateLogs();
 
-		// ロギング
 		let line = `${Timestamp.timestamp0()} [ERROR] `;
 		for (const e of params) {
 			line += e;
 		}
-		line += "\n";
-		fs.appendFileSync("electron-app-1.log", line);
-
-		// 標準出力にも書き込み
+		fs.appendFileSync("electron-app-1.log", line + "\n");
 		console.error(line);
 	}
 }
