@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import jsyaml from "js-yaml";
-import { Logger } from "./Logger";
-import { CommandlineArguments } from "./CommandlineArguments";
+import { Logger } from "../log/Logger";
+import { CommandlineArguments } from "../util/CommandlineArguments";
 
 /**
  * コンフィギュレーション
@@ -35,8 +35,8 @@ export class ConfigurationSettings {
 	private _configure(path: string): void {
 
 		try {
-			Logger.trace("<ConfigurationSettings._configure()> $$$ begin configuration $$$");
-			Logger.trace("<ConfigurationSettings._configure()> path: [%s]", path);
+			Logger.debug("<ConfigurationSettings._configure()> $$$ begin configuration $$$");
+			Logger.debug("<ConfigurationSettings._configure()> path: [%s]", path);
 			const content = readFileSync(path, { encoding: "utf-8" });
 			const tree = jsyaml.safeLoad(content);
 			const args = CommandlineArguments.getInstance();
