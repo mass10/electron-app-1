@@ -1,7 +1,7 @@
 node_modules
 dist
 conf/.application-settings-snapshot.yml
-.electron-app-1.log
+electron-app-1.log
 yarn-error.log
 OUT
 
@@ -9,3 +9,4 @@ OUT
 # Added by cargo
 
 /target
+
