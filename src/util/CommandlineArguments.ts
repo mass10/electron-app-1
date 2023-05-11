@@ -6,20 +6,17 @@ let _conf: CommandlineArguments | null = null;
  * コマンドライン引数の解析器
  */
 export class CommandlineArguments {
-
 	private readonly _map = new Map<string, any>();
 
 	/**
 	 * コンストラクター
 	 */
 	private constructor() {
-
 		this._configure();
 	}
 
 	public static getInstance(): CommandlineArguments {
-		if (_conf === null)
-			_conf = new CommandlineArguments();
+		if (_conf === null) _conf = new CommandlineArguments();
 		return _conf;
 	}
 
@@ -27,7 +24,6 @@ export class CommandlineArguments {
 	 * コンフィギュレーション
 	 */
 	private _configure(): void {
-
 		// すべて消去
 		this._map.clear();
 
@@ -35,8 +31,7 @@ export class CommandlineArguments {
 		const options = {};
 		for (const e of process.argv) {
 			if (e === "--") {
-			}
-			else if (e.startsWith("--")) {
+			} else if (e.startsWith("--")) {
 				if (option) {
 					// 保留しているオプションを確定(boolean として格納)
 					this._map.set(option, true);
@@ -48,13 +43,11 @@ export class CommandlineArguments {
 					const right = e.substr(e.indexOf("=") + 1);
 					this._map.set(left, right);
 					Logger.debug("option [", left, "] ... [", right, "]");
-				}
-				else {
+				} else {
 					// このオプションを保留
 					option = e;
 				}
-			}
-			else {
+			} else {
 				if (option) {
 					// 保留しているオプションを確定(string として格納)
 					this._map.set(option, e);
@@ -71,27 +64,24 @@ export class CommandlineArguments {
 			option = "";
 		}
 
-		if (false)
-			this.dump();
+		if (false) this.dump();
 	}
 
 	/**
 	 * 取り出し
-	 * 
-	 * @param key 
+	 *
+	 * @param key
 	 */
 	public get(key: string): string {
-
 		return this._map.get(key) ?? "";
 	}
 
 	/**
 	 * 取り出し
-	 * 
-	 * @param key 
+	 *
+	 * @param key
 	 */
 	public getBoolean(key: string): boolean {
-
 		const value = ("" + this._map.get(key)).toLowerCase();
 		return value === "true" || value === "1";
 	}
@@ -100,7 +90,6 @@ export class CommandlineArguments {
 	 * デバッグ用
 	 */
 	public dump(): void {
-
 		Logger.debug("parameter dump");
 		this._map.forEach((value: string, key: string) => {
 			Logger.debug("parameter [", key, "] >> [", value, "]");
