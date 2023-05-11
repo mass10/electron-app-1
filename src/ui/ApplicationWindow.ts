@@ -1,9 +1,9 @@
 import electron from "electron";
-import { ConfigurationSettings } from "./ConfigurationSettings";
-import { Logger } from "./Logger";
+import { ConfigurationSettings } from "../configuration/ConfigurationSettings";
+import { Logger } from "../log/Logger";
 import path from "path";
-import { Application } from "./Application";
-import { CommandlineArguments } from "./CommandlineArguments";
+import { Application } from "../core/Application";
+import { CommandlineArguments } from "../util/CommandlineArguments";
 import { WindowSnapshot } from "./WindowSnapshot";
 import fs from "fs";
 
@@ -21,7 +21,7 @@ export type WindowParameter = {
 function detectPath(relativePath: string): string {
 	let absolutePath = path.resolve(relativePath);
 	if (!fs.existsSync(absolutePath)) return "";
-	Logger.trace(`ファイルを検出した！ ${absolutePath}`);
+	Logger.debug(`ファイルを検出した！ ${absolutePath}`);
 	return absolutePath
 }
 
@@ -117,7 +117,7 @@ export class ApplicationWindow {
 	 * ウィンドウが閉じられたとき
 	 */
 	private static onClosed(): void {
-		Logger.trace("<ApplicationWindow.onClosed()> EVENT: [closed]");
+		Logger.debug("<ApplicationWindow.onClosed()> EVENT: [closed]");
 		// ウィンドウを閉じます。
 		ApplicationWindow.getInstance().close();
 	}
@@ -186,7 +186,7 @@ export class ApplicationWindow {
 		if (this._window)
 			return this._window;
 		// コンフィギュレーション
-		Logger.trace("コンフィギュレーション");
+		Logger.debug("コンフィギュレーション");
 		const conf = ConfigurationSettings.getInstance();
 		// ウィンドウの状態を復元します。
 		const windowState = new WindowSnapshot();
@@ -203,12 +203,12 @@ export class ApplicationWindow {
 			}
 		} as electron.BrowserWindowConstructorOptions;
 		// アプリケーションのメインウィンドウです。
-		Logger.trace("<WindowSnapshot.createWindow()> Window state ", JSON.stringify(parameters));
+		Logger.debug("<WindowSnapshot.createWindow()> Window state ", JSON.stringify(parameters));
 		const window = new electron.BrowserWindow(parameters);
 		{
 			const pathname = path.resolve("./index.html");
 			const state = fs.existsSync(pathname);
-			Logger.trace(`${pathname} が存在しているかチェック ... ${state}`);
+			Logger.debug(`${pathname} が存在しているかチェック ... ${state}`);
 		}
 		// メインウィンドウで index.html を開きます。
 		window.loadFile("./index.html");
