@@ -1,4 +1,4 @@
-import { Logger } from "./Logger";
+import { Logger } from "../log/Logger";
 
 let _conf: CommandlineArguments | null = null;
 
@@ -40,14 +40,14 @@ export class CommandlineArguments {
 				if (option) {
 					// 保留しているオプションを確定(boolean として格納)
 					this._map.set(option, true);
-					Logger.trace("option [", option, "] ... [true]");
+					Logger.debug("option [", option, "] ... [true]");
 					option = "";
 				}
 				if (0 <= e.indexOf("=")) {
 					const left = e.substr(0, e.indexOf("="));
 					const right = e.substr(e.indexOf("=") + 1);
 					this._map.set(left, right);
-					Logger.trace("option [", left, "] ... [", right, "]");
+					Logger.debug("option [", left, "] ... [", right, "]");
 				}
 				else {
 					// このオプションを保留
@@ -58,7 +58,7 @@ export class CommandlineArguments {
 				if (option) {
 					// 保留しているオプションを確定(string として格納)
 					this._map.set(option, e);
-					Logger.trace("option [", option, "] ... [", e, "]");
+					Logger.debug("option [", option, "] ... [", e, "]");
 					option = "";
 				}
 				console.log("value [" + e + "] is ignored.");
@@ -67,7 +67,7 @@ export class CommandlineArguments {
 
 		if (option) {
 			this._map.set(option, true);
-			Logger.trace("option [", option, "] ... [true]");
+			Logger.debug("option [", option, "] ... [true]");
 			option = "";
 		}
 
@@ -101,9 +101,9 @@ export class CommandlineArguments {
 	 */
 	public dump(): void {
 
-		Logger.trace("parameter dump");
+		Logger.debug("parameter dump");
 		this._map.forEach((value: string, key: string) => {
-			Logger.trace("parameter [", key, "] >> [", value, "]");
+			Logger.debug("parameter [", key, "] >> [", value, "]");
 		});
 	}
 }
