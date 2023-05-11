@@ -3,7 +3,6 @@ import { Logger } from "./log/Logger";
 import log from "electron-log";
 
 function init(): void {
-
 	return;
 
 	console.log = log.log;
@@ -14,9 +13,7 @@ function init(): void {
  * エントリーポイントです。ここからアプリケーションが開始されます。
  */
 function main(): void {
-
 	try {
-
 		init();
 
 		log.info("### start ###");
@@ -24,8 +21,7 @@ function main(): void {
 		const app = Application.getInstance();
 		app.run();
 		log.info("--- end ---");
-	}
-	catch (e) {
+	} catch (e) {
 		console.error(e);
 	}
 }
