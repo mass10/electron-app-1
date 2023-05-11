@@ -1,5 +1,5 @@
 import electron from "electron";
-import { ConfigurationSettings } from "../configuration/ConfigurationSettings"
+import { ConfigurationSettings } from "../configuration/ConfigurationSettings";
 import { Logger } from "../log/Logger";
 import { ApplicationWindow } from "../ui/ApplicationWindow";
 import path from "path";
@@ -13,14 +13,13 @@ let _netlog = false;
 
 async function startNetLogging(): Promise<void> {
 	stopNetLogging();
-	_netlog = true;	
-	await electron.netLog.startLogging('./netlog');
-	console.log('Net-logs written to ./netlog');
+	_netlog = true;
+	await electron.netLog.startLogging("./netlog");
+	console.log("Net-logs written to ./netlog");
 }
 
 function stopNetLogging(): void {
-	if (_netlog === false)
-		return;
+	if (_netlog === false) return;
 	electron.netLog.stopLogging();
 	_netlog = false;
 }
@@ -29,7 +28,6 @@ function stopNetLogging(): void {
  * アプリケーション本体のクラス
  */
 export class Application {
-
 	/** electron.App */
 	private readonly _application = electron.app;
 
@@ -39,15 +37,12 @@ export class Application {
 	/**
 	 * コンストラクター
 	 */
-	private constructor() {
-
-	}
+	private constructor() {}
 
 	/**
 	 * electron.App オブジェクトを返します。
 	 */
 	private getElectronApp(): electron.App {
-
 		return this._application;
 	}
 
@@ -55,11 +50,10 @@ export class Application {
 	 * すべてのウィンドウが閉じられたときのイベントハンドラーです。
 	 */
 	public static onApplicationClose(): void {
-
 		Logger.debug(["<Application.onApplicationClose()>"]);
 
 		switch (process.platform) {
-			case 'darwin':
+			case "darwin":
 				// なにもしない
 				break;
 			default:
@@ -71,13 +65,11 @@ export class Application {
 
 	/** ネットワーク関連の詳細ログ */
 	private static async setupLogging() {
-
 		return;
 		startNetLogging();
 	}
 
 	private static async onApplicationReady() {
-
 		Logger.debug("<Application.onApplicationReady()>");
 
 		await Application.setupLogging();
@@ -88,7 +80,6 @@ export class Application {
 		electron.globalShortcut.register("F12", () => {
 			ApplicationWindow.getInstance().openDevTools();
 		});
-		ApplicationWindow.getInstance().openDevTools();
 
 		// temporary data ??
 		{
@@ -104,13 +95,11 @@ export class Application {
 	}
 
 	private static onApplicationActivate(): void {
-
 		Logger.debug("<Application.onApplicationActivate()>");
 		ApplicationWindow.getInstance().createWindow();
 	}
 
 	private static onApplicationWillQuit(): void {
-
 		Logger.debug("<Application.onApplicationWillQuit()>");
 		stopNetLogging();
 	}
@@ -119,13 +108,12 @@ export class Application {
 
 	/**
 	 * アプリケーションの状態を保存します。
-	 * 
+	 *
 	 * @param flush true が要求された場合はファイルに書き込みを行います。
 	 * false のときはメモリを更新するだけです。
 	 * 引数が指定されなかっったときは false が指定されたものとします。
 	 */
 	public saveAppStatus(flush: boolean = false): void {
-
 		// ウィンドウの状態を取得します。
 		const window = ApplicationWindow.getInstance();
 		if (!window)
@@ -159,7 +147,6 @@ export class Application {
 	 * アプリケーションを終了します。
 	 */
 	public quit(): void {
-
 		Logger.debug("<Application.quit()>");
 
 		// アプリケーションの終了状態を保存します。
@@ -182,18 +169,18 @@ export class Application {
 	 * アプリケーションを実行します。
 	 */
 	public run(): void {
-
 		Logger.debug("<Application.run()> ### START ###");
 
 		// 実行時の予期しない例外をキャッチする方法？？
-		process.on("uncaughtException", (err) => {
+		process.on("uncaughtException", async (err: unknown) => {
+			console.error(`uncaughtException: ${err}`);
 			const messageBoxOptions = {
 				type: "error",
 				title: "Error in Main process",
-				message: "Something failed"
+				message: "Something failed",
 			};
-			electron.dialog.showMessageBox(messageBoxOptions);
-			throw err;
+			await electron.dialog.showMessageBox(messageBoxOptions);
+			// throw err;
 		});
 
 		const conf = ConfigurationSettings.getInstance();
@@ -214,13 +201,13 @@ export class Application {
 		}
 
 		// アプリケーションが準備できた？
-		app.on('ready', Application.onApplicationReady);
+		app.on("ready", Application.onApplicationReady);
 		// ウィンドウが閉じられた？
-		app.on('window-all-closed', Application.onApplicationClose);
+		app.on("window-all-closed", Application.onApplicationClose);
 		// ウィンドウがアクティブになった？
-		app.on('activate', Application.onApplicationActivate);
+		app.on("activate", Application.onApplicationActivate);
 		// ？
-		app.on('will-quit', Application.onApplicationWillQuit);
+		app.on("will-quit", Application.onApplicationWillQuit);
 		// IPC message
 		electron.ipcMain.on("#random", Application.onIPCMessage);
 
