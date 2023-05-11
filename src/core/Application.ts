@@ -1,11 +1,11 @@
 import electron from "electron";
-import { ConfigurationSettings } from "./ConfigurationSettings"
-import { Logger } from "./Logger";
-import { ApplicationWindow } from "./ApplicationWindow";
+import { ConfigurationSettings } from "../configuration/ConfigurationSettings"
+import { Logger } from "../log/Logger";
+import { ApplicationWindow } from "../ui/ApplicationWindow";
 import path from "path";
 import os from "os";
-import { CommandlineArguments } from "./CommandlineArguments";
-import { WindowSnapshot } from "./WindowSnapshot";
+import { CommandlineArguments } from "../util/CommandlineArguments";
+import { WindowSnapshot } from "../ui/WindowSnapshot";
 import child_process from "child_process";
 
 /** ネットワーク関連の詳細ログ */
@@ -56,7 +56,7 @@ export class Application {
 	 */
 	public static onApplicationClose(): void {
 
-		Logger.trace(["<Application.onApplicationClose()>"]);
+		Logger.debug(["<Application.onApplicationClose()>"]);
 
 		switch (process.platform) {
 			case 'darwin':
@@ -78,7 +78,7 @@ export class Application {
 
 	private static async onApplicationReady() {
 
-		Logger.trace("<Application.onApplicationReady()>");
+		Logger.debug("<Application.onApplicationReady()>");
 
 		await Application.setupLogging();
 
@@ -93,7 +93,7 @@ export class Application {
 		// temporary data ??
 		{
 			const userData = Application.getInstance().getElectronApp().getPath("userData");
-			Logger.trace(`userData is ${userData}`);
+			Logger.debug(`userData is ${userData}`);
 		}
 
 		// Cookie ??
@@ -105,13 +105,13 @@ export class Application {
 
 	private static onApplicationActivate(): void {
 
-		Logger.trace("<Application.onApplicationActivate()>");
+		Logger.debug("<Application.onApplicationActivate()>");
 		ApplicationWindow.getInstance().createWindow();
 	}
 
 	private static onApplicationWillQuit(): void {
 
-		Logger.trace("<Application.onApplicationWillQuit()>");
+		Logger.debug("<Application.onApplicationWillQuit()>");
 		stopNetLogging();
 	}
 
@@ -160,7 +160,7 @@ export class Application {
 	 */
 	public quit(): void {
 
-		Logger.trace("<Application.quit()>");
+		Logger.debug("<Application.quit()>");
 
 		// アプリケーションの終了状態を保存します。
 		this.saveAppStatus(true);
@@ -173,7 +173,7 @@ export class Application {
 	 */
 	private async loadExtensions(): Promise<void> {
 		const currentDir = path.resolve(".");
-		Logger.trace("Your current directory is ... [", currentDir, "].");
+		Logger.debug("Your current directory is ... [", currentDir, "].");
 		const editorPath = path.join(__dirname, "my-extension-1");
 		electron.BrowserWindow.addExtension(editorPath);
 	}
@@ -183,7 +183,7 @@ export class Application {
 	 */
 	public run(): void {
 
-		Logger.trace("<Application.run()> ### START ###");
+		Logger.debug("<Application.run()> ### START ###");
 
 		// 実行時の予期しない例外をキャッチする方法？？
 		process.on("uncaughtException", (err) => {
@@ -210,7 +210,7 @@ export class Application {
 
 		{
 			const path = app.getPath("userData");
-			Logger.trace(`userData is: [${path}]`);
+			Logger.debug(`userData is: [${path}]`);
 		}
 
 		// アプリケーションが準備できた？
@@ -224,7 +224,7 @@ export class Application {
 		// IPC message
 		electron.ipcMain.on("#random", Application.onIPCMessage);
 
-		Logger.trace(["<Application.run()> --- END ---"]);
+		Logger.debug(["<Application.run()> --- END ---"]);
 	}
 
 	/**
@@ -237,7 +237,7 @@ export class Application {
 
 	private static onIPCMessage(event: electron.IpcMainEvent, args: any[]): void {
 		const message = `${args}`;
-		Logger.trace("<Application.onIPCMessage()> RECV! [" + message + "] ", JSON.stringify(args));
+		Logger.debug("<Application.onIPCMessage()> RECV! [" + message + "] ", JSON.stringify(args));
 		event.returnValue = "OK";
 	}
 }
