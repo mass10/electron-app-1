@@ -1,5 +1,5 @@
-import { Application } from "./Application";
-import { Logger } from "./Logger";
+import { Application } from "./core/Application";
+import { Logger } from "./log/Logger";
 import log from "electron-log";
 
 function init(): void {
@@ -20,7 +20,7 @@ function main(): void {
 		init();
 
 		log.info("### start ###");
-		Logger.trace("<main()> called.");
+		Logger.debug("<main()> called.");
 		const app = Application.getInstance();
 		app.run();
 		log.info("--- end ---");
