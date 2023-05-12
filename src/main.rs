@@ -1,3 +1,30 @@
+/// Destroy でファイルを削除するトレイト
+trait Destroy {
+	fn destroy(&self) -> std::result::Result<(), Box<dyn std::error::Error>>;
+}
+
+struct FileEraser {
+	path: std::path::PathBuf,
+}
+
+impl FileEraser {
+	pub fn new(path: &str) -> Self {
+		Self {
+			path: std::path::PathBuf::from(path),
+		}
+	}
+}
+
+/// ファイルを削除します。
+impl Destroy for FileEraser {
+	fn destroy(&self) -> std::result::Result<(), Box<dyn std::error::Error>> {
+		if self.path.exists() {
+			std::fs::remove_file(&self.path)?;
+		}
+		return Ok(());
+	}
+}
+
 /// テキストファイルを作成します。
 fn create_text_file(path: &str, content: &str) -> std::result::Result<(), Box<dyn std::error::Error>> {
 	std::fs::write(path, content)?;
@@ -21,14 +48,15 @@ fn execute_command(command: &[&str]) -> std::result::Result<(), Box<dyn std::err
 #[allow(unused)]
 fn execute_string_on_shell(command: &str) -> std::result::Result<(), Box<dyn std::error::Error>> {
 	// 文字列をファイルに保存します。
-	let path = "temp.bat";
+	let path = ".tmp.bat";
+	let _eraser = FileEraser::new(path);
 	create_text_file(path, command).expect("Failed to create text file");
 	execute_command(&["cmd", "/C", path])?;
 	return Ok(());
 }
 
+/// アプリケーションのトランスパイル
 fn build() -> std::result::Result<(), Box<dyn std::error::Error>> {
-	// ビルドします。
 	execute_command(&["yarn.cmd", "install"])?;
 	execute_command(&["yarn.cmd", "tsc", "--build"])?;
 	return Ok(());
@@ -40,6 +68,7 @@ fn open_explorer(path: &str) -> std::result::Result<(), Box<dyn std::error::Erro
 	return Ok(());
 }
 
+/// アプリケーションのインストーラーを作成します。
 fn build_installer() -> std::result::Result<(), Box<dyn std::error::Error>> {
 	execute_command(&["yarn.cmd", "install"])?;
 	execute_command(&["yarn.cmd", "tsc", "--build"])?;
@@ -59,6 +88,7 @@ fn build_installer() -> std::result::Result<(), Box<dyn std::error::Error>> {
 	return Ok(());
 }
 
+/// アプリケーションのエントリーポイント
 fn main() {
 	let args = std::env::args().skip(1).collect::<Vec<String>>();
 	if args.len() == 0 {
